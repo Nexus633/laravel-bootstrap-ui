@@ -15,7 +15,7 @@ return [
     'flash' => [
         // Sollen Flash-Nachrichten (Alerts) automatisch verschwinden?
         // 0 = Nein, >0 = Millisekunden (z.B. 5000)
-        'auto_dismiss' => 5000,
+        'auto_dismiss' => 3000,
 
         // Sollen Animationen (Fade in/Out) aktiv sein?
         'animate' => true,
