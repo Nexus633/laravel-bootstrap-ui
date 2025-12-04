@@ -1,20 +1,35 @@
 @props([
-    'as' => null,
-    'icon' => null
+    'name',
+    'size' => null,    // 1 bis 6 (für fs-1, fs-2...)
+    'variant' => null, // primary, secondary, danger, success, etc.
+    'asInput' => false,
 ])
 @php
-    $withInput = $as === 'input';
-    if(!$withInput){
-        $withInput = $attributes->get('as:input') ?? null;
-        $attributes = $attributes->except('as:input');
+    $asInput = $attributes->get('as:input') ?? $asInput;
+
+    // 1. Intelligent das Präfix handhaben
+    $iconName = str_starts_with($name, 'bi-') ? $name : 'bi-' . $name;
+
+    // 2. Basis-Klasse
+    $classes = 'bi ' . $iconName;
+
+    // 3. Größe hinzufügen
+    if ($size) {
+        $classes .= ' fs-' . $size;
+    }
+
+    // 4. Variante (Farbe) hinzufügen
+    // Aus variant="danger" wird class="text-danger"
+    if ($variant) {
+        $classes .= ' text-' . $variant;
     }
 @endphp
 
 
-@if($withInput)
-    <span {{ $attributes->merge(['class' => 'input-group-text']) }}>
-        <i class="bi {{ $icon }}" aria-hidden="true"></i>
+@if($asInput)
+    <span class="input-group-text">
+        <i {{ $attributes->merge(['class' => $classes]) }} aria-hidden="true"></i>
     </span>
 @else
-    <i class="bi {{ $icon }}" aria-hidden="true"></i>
+    <i {{ $attributes->merge(['class' => $classes]) }} aria-hidden="true"></i>
 @endif
