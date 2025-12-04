@@ -1,72 +1,95 @@
 @props([
-    'name',                  // Wichtig für wire:model und Error-Bag
-    'label' => null,         // Das Label über dem Input
-    'type' => 'text',        // text, password, email, number...
-    'hint' => null,          // Kleiner Hilfetext unter dem Input
-    'prepend' => null,       // Text/Icon VOR dem Input (z.B. '€' oder Icon)
-    'append' => null,        // Text/Icon NACH dem Input
+    'name',
+    'label' => null,
+    'type' => 'text',
+    'hint' => null,
+    'prepend' => null,
+    'append' => null,
+    'size' => null,      // sm, lg
+    // NEU: Wenn true, wird kein Container/Label gerendert (für komplexe Groups)
+    'simple' => false,
 ])
 
 @php
-    // Wir bauen eine ID, falls keine übergeben wurde, damit das Label funktioniert.
-    // Wir nutzen 'name' oder generieren einen Hash, falls name fehlt.
-    $id = $attributes->get('id') ?? $name ?? 'input-' . md5($attributes->wire('model'));
+    $isPrependIcon = (bool)$attributes->get('icon:prepend');
+    $isAppendIcon = (bool)$attributes->get('icon:append');
 
-    // Fehler-Ermittlung: Check, ob es einen Error für diesen Namen gibt
-    // Wir nutzen $errors->has(), was in Blade global verfügbar ist.
+    $prepend = $attributes->get('icon:prepend') ?? $prepend;
+    $append = $attributes->get('icon:append') ?? $append;
+
+    $attributes = $attributes->except(['icon:append', 'icon:prepend']);
+
+    $id = $attributes->get('id') ?? 'input-' . uniqid();
     $hasError = $name && $errors->has($name);
-    
-    // Haben wir Prepend/Append Slots oder Props? Dann brauchen wir eine input-group
-    $hasGroup = $prepend || $append || $slot->isNotEmpty();
+
+    // Checken ob wir interne Groups brauchen (nur wenn NICHT simple mode)
+    $hasInternalGroup = !$simple && ($prepend || $append || $slot->isNotEmpty());
+
+    $inputClasses = 'form-control';
+    if($hasError) $inputClasses .= ' is-invalid';
+    if($size) $inputClasses .= ' form-control-' . $size;
 @endphp
 
-<div class="mb-3">
-    {{-- 1. Das Label --}}
-    @if($label)
-        <label for="{{ $id }}" class="form-label">
-            {{ $label }}
-        </label>
-    @endif
+@if($simple)
+    {{--
+        SIMPLE MODE: Nur das Input-Feld (für komplexe Input-Groups).
+        Kein Label, kein mb-3 Wrapper.
+    --}}
+    <input
+            id="{{ $id }}"
+            type="{{ $type }}"
+            name="{{ $name }}"
+            {{ $attributes->merge(['class' => $inputClasses]) }}
+    />
+@else
+    {{-- STANDARD MODE: Mit Label, Wrapper und internen Addons --}}
+    <div class="mb-3">
+        @if($label)
+            <label for="{{ $id }}" class="form-label">{{ $label }}</label>
+        @endif
 
-    {{-- 2. Der Input-Wrapper (Input Group falls nötig) --}}
-    @if($hasGroup)
-        <div class="input-group {{ $hasError ? 'is-invalid' : '' }}">
-            {{-- Prepend (z.B. € Zeichen) --}}
-            @if($prepend)
-                <span class="input-group-text">{!! $prepend !!}</span>
-            @endif
+        @if($hasInternalGroup)
+            <div class="input-group {{ $hasError ? 'is-invalid' : '' }} {{ $size ? 'input-group-'.$size : '' }}">
+                @if($prepend)
+                    <span class="input-group-text">
+                    @if($isPrependIcon)
+                        <i class="bi {{ $prepend }}" aria-hidden="true"></i>
+                    @else
+                        {!! $prepend !!}
+                    @endif
+                    </span>
+                @endif
 
-            {{-- Der eigentliche Input (im Group Kontext) --}}
-            <input
+                <input
                     id="{{ $id }}"
                     type="{{ $type }}"
                     name="{{ $name }}"
-                    {{ $attributes->class(['form-control', 'is-invalid' => $hasError]) }}
-            />
+                    {{ $attributes->merge(['class' => $inputClasses]) }}
+                />
 
-            {{-- Append (z.B. .00) --}}
-            @if($append)
-                <span class="input-group-text">{!! $append !!}</span>
-            @endif
-        </div>
-    @else
-        {{-- Standard Input ohne Group --}}
-        <input
+                @if($append)
+                    <span class="input-group-text">
+                        @if($isAppendIcon)
+                            <i class="bi {{ $append }}" aria-hidden="true"></i>
+                        @else
+                            {!! $append !!}
+                        @endif
+                    </span>
+                @endif
+            </div>
+        @else
+            <input
                 id="{{ $id }}"
                 type="{{ $type }}"
                 name="{{ $name }}"
-                {{ $attributes->class(['form-control', 'is-invalid' => $hasError]) }}
-        />
-    @endif
+                {{ $attributes->merge(['class' => $inputClasses]) }}
+            />
+        @endif
 
-    {{-- 3. Feedback: Error oder Hint --}}
-    @if($hasError)
-        <div class="invalid-feedback">
-            {{ $errors->first($name) }}
-        </div>
-    @elseif($hint)
-        <div class="form-text text-muted">
-            {{ $hint }}
-        </div>
-    @endif
-</div>
+        @if($hasError)
+            <div class="invalid-feedback">{{ $errors->first($name) }}</div>
+        @elseif($hint)
+            <div class="form-text text-muted">{{ $hint }}</div>
+        @endif
+    </div>
+@endif

@@ -97,12 +97,12 @@
     >
         <template x-for="(alert, index) in alerts">
             <div
-                    :key="index"
-                    :data-alert-id="alert.id"
-                    x-init="setupAutoDismiss($el, alert.id)"
-                    class="alert d-flex alert-dismissible shadow-sm mb-3"
-                    :class="['alert-' + alert.variant, @js($animate) ? @js($animate_enter_class) : '']"
-                    role="alert"
+                :key="index"
+                :data-alert-id="alert.id"
+                x-init="setupAutoDismiss($el, alert.id)"
+                class="alert d-flex alert-dismissible shadow-sm mb-3"
+                :class="['alert-' + alert.variant, @js($animate) ? @js($animate_enter_class) : '']"
+                role="alert"
             >
                 <i :class="alert.icon" class="flex-shrink-0 me-3 fs-4 mt-1"></i>
 
@@ -114,10 +114,10 @@
                 </div>
 
                 <button
-                        type="button"
-                        class="btn-close"
-                        @click="handleRemove($el.closest('.alert'), alert.id)"
-                        aria-label="Close"
+                    type="button"
+                    class="btn-close"
+                    @click="handleRemove($el.closest('.alert'), alert.id)"
+                    aria-label="Close"
                 ></button>
             </div>
         </template>

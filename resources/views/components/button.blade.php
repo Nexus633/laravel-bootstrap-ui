@@ -9,6 +9,7 @@
 ])
 
 @php
+    $id = $attributes->get('id') ?? 'btn-' . uniqid();
     $classes = 'btn';
 
     // Logik für Outline vs Solid
@@ -26,7 +27,7 @@
     $tag = $isLink ? 'a' : 'button';
 @endphp
 
-<{{ $tag }}
+<{{ $tag }} id="{{ $id }}"
     @if(!$isLink) type="{{ $type }}" @endif
 {{ $attributes->merge(['class' => $classes]) }}
 @if($loading && !$isLink)

@@ -114,13 +114,13 @@
 >
 <template x-for="(t, index) in toasts">
     <div
-            :key="index"
-            :data-toast-id="t.id"
-            class="toast show mb-2"
-            :class="getEnterClass()"
-            role="alert"
-            aria-live="assertive"
-            aria-atomic="true"
+        :key="index"
+        :data-toast-id="t.id"
+        class="toast show mb-2"
+        :class="getEnterClass()"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
     >
         <div class="toast-header">
             <i :class="t.icon" class="me-2 fs-5"></i>

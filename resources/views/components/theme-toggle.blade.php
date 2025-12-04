@@ -7,6 +7,7 @@
 ])
 
 @php
+    $id = $attributes->get('id') ?? 'btn-' . uniqid();
     $classes = 'btn btn-' . $variant;
     if($size) $classes .= ' btn-' . $size;
 
@@ -19,6 +20,7 @@
 @endphp
 
 <button
+    id="{{ $id }}"
     type="button"
     {{ $cleanAttributes->merge(['class' => $classes]) }}
     x-data="{

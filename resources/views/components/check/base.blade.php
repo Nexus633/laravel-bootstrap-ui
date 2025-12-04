@@ -13,7 +13,7 @@
     $wireModel = $attributes->wire('model');
     
     // ID-Generierung: Zentralisiert für alle Typen
-    $id = $attributes->get('id') ?? ($name ?? 'chk') . '-' . str_replace(' ', '', $value) . '-' . md5($wireModel);
+    $id = $attributes->get('id') ?? 'chk' . '-' . uniqid();
     
     $hasError = $name && $errors->has($name);
 

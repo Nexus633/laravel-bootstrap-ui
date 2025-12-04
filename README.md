@@ -102,6 +102,17 @@ Automatische Labels, Fehlerbehandlung und Input-Groups.
 />
 ```
 
+Verwende Icons statt Text
+```html
+<x-bs::input
+    name="email"
+    label="E-Mail Adresse"
+    type="email"
+    icon:prepend="bi bi-envelope"
+    wire:model="email"
+/>
+```
+
 ### Formulare (Select)
 Akzeptiert Arrays oder Slots.
 
