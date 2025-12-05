@@ -51,10 +51,7 @@ Füge die Direktiven und globalen Komponenten in dein Haupt-Layout ein (z.B. `re
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Page Title' }}</title>
 
-    @bootstrapStyles
-    @bootstrapIcons
-
-    @bootstrapThemeScript
+    <x-bs::head />
 </head>
 <body>
 
@@ -63,7 +60,7 @@ Füge die Direktiven und globalen Komponenten in dein Haupt-Layout ein (z.B. `re
 
     {{ $slot }}
 
-    @bootstrapScripts
+    <x-bs::scripts />
 </body>
 </html>
 ```
