@@ -160,7 +160,7 @@ Schaltet zwischen Light/Dark Mode um und speichert die Wahl.
 ```html
 <x-bs::theme-toggle />
 
-<x-bs::theme-toggle icon:light="fa-solid fa-sun" icon:dark="fa-solid fa-moon" />
+<x-bs::theme-toggle icon:light="bi bi-sun-fill" icon:dark="bi bi-moon-stars-fill" />
 ```
 
 ---
