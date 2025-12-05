@@ -1,25 +1,32 @@
 {
     "name": "nexus633/laravel-bootstrap-ui",
-    "description": "Bootstrap 5 UI Components for Livewire",
     "type": "library",
+    "description": "Bootstrap 5 UI Components for Livewire",
+    "keywords": ["bootstrap","components", "laravel", "livewire"],
+    "homepage": "https://github.com/Nexus633/laravel-bootstrap-ui",
     "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Nexus633\\BootstrapUi\\": "src/"
-        }
-    },
     "authors": [
         {
             "name": "Andre",
-            "email": "Nexus633@googlemail.com"
+            "email": "Nexus633@googlemail.com",
+            "role": "Developer"
         }
     ],
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "livewire/livewire": "^3.6"
+    },
+    "autoload": {
+      "psr-4": {
+        "Nexus633\\BootstrapUi\\": "src/"
+      }
+    },
     "extra": {
         "laravel": {
             "providers": [
                 "Nexus633\\BootstrapUi\\BootstrapUiServiceProvider"
             ]
         }
-    },
-    "require": {}
+    }
 }
