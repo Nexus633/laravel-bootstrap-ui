@@ -7,11 +7,12 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\Icon;
     $classes = 'dropdown-item d-flex align-items-center';
     if ($active) $classes .= ' active';
     if ($disabled) $classes .= ' disabled';
     if ($danger) $classes .= ' text-danger';
-
+    $icon = Icon::toClass($icon);
     // Tag bestimmen: Link oder Button?
     $tag = $href ? 'a' : 'button';
 @endphp

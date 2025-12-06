@@ -1,10 +1,11 @@
 @props([
     'variant' => 'primary', // success, danger, warning, info
     'dismissible' => false,
-    'icon' => null,         
+    'icon' => null,
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\Icon;
     // Automatische Icon-Wahl basierend auf Variante (Bootstrap Icons)
     if (!$icon) {
         $icon = match($variant) {
@@ -14,6 +15,8 @@
             'info' => 'bi bi-info-circle-fill',
             default => 'bi bi-info-circle',
         };
+    }else{
+        $icon = Icon::toClass($icon);
     }
     
     // Alias Korrektur: Falls jemand 'error' statt 'danger' schreibt

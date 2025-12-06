@@ -5,20 +5,18 @@
     'asInput' => false,
 ])
 @php
+    use Nexus633\BootstrapUi\Facades\Icon;
     $asInput = $attributes->get('as:input') ?? $asInput;
 
-    // 1. Intelligent das Präfix handhaben
-    $iconName = str_starts_with($name, 'bi-') ? $name : 'bi-' . $name;
+    // 1. Basis-Klasse
+    $classes = Icon::toClass($name);
 
-    // 2. Basis-Klasse
-    $classes = 'bi ' . $iconName;
-
-    // 3. Größe hinzufügen
+    // 2. Größe hinzufügen
     if ($size) {
         $classes .= ' fs-' . $size;
     }
 
-    // 4. Variante (Farbe) hinzufügen
+    // 3. Variante (Farbe) hinzufügen
     // Aus variant="danger" wird class="text-danger"
     if ($variant) {
         $classes .= ' text-' . $variant;

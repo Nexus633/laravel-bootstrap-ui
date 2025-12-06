@@ -2,11 +2,12 @@
     'variant' => 'outline-secondary',
     'size' => null,
     // Fallbacks
-    'lightIcon' => 'bi bi-sun-fill',
-    'darkIcon' => 'bi bi-moon-stars-fill',
+    'lightIcon' => 'sun-fill',
+    'darkIcon' => 'moon-stars-fill',
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\Icon;
     $id = $attributes->get('id') ?? 'btn-' . uniqid();
     $classes = 'btn btn-' . $variant;
     if($size) $classes .= ' btn-' . $size;
@@ -14,6 +15,9 @@
     // Falls Attribut vorhanden, entsprechend nehmen
     $lightIcon = $attributes->get('icon:light') ?? $lightIcon;
     $darkIcon = $attributes->get('icon:dark') ?? $darkIcon;
+
+    $lightIcon = Icon::toClass($lightIcon);
+    $darkIcon = Icon::toClass($darkIcon);
 
     // WICHTIG: Die Custom-Attribute entfernen, damit sie nicht im HTML landen
     $cleanAttributes = $attributes->except(['icon:light', 'icon:dark']);

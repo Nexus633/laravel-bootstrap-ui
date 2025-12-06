@@ -1,19 +1,19 @@
 @props([
-'name',
-'label' => null,
-'options' => [],       // Array: ['value' => 'Label']
-'placeholder' => null, // Z.B. "Bitte wählen..."
-'hint' => null,
-'disabled' => false,
+    'name',
+    'label' => null,
+    'options' => [],       // Array: ['value' => 'Label']
+    'placeholder' => null, // Z.B. "Bitte wählen..."
+    'hint' => null,
+    'disabled' => false,
 ])
 
 @php
-// ID generieren (für Label-Verknüpfung)
-$wireModel = $attributes->wire('model');
-$id = $attributes->get('id') ?? 'select-' . uniqid();
+    // ID generieren (für Label-Verknüpfung)
+    $wireModel = $attributes->wire('model');
+    $id = $attributes->get('id') ?? 'select-' . uniqid();
 
-// Fehler prüfen
-$hasError = $name && $errors->has($name);
+    // Fehler prüfen
+    $hasError = $name && $errors->has($name);
 @endphp
 
 <div class="mb-3">
@@ -32,12 +32,12 @@ $hasError = $name && $errors->has($name);
         >
         {{-- 1. Placeholder Option (leer & disabled) --}}
         @if($placeholder)
-        <option value="" selected>{{ $placeholder }}</option>
+            <option value="" selected>{{ $placeholder }}</option>
         @endif
 
         {{-- 2. Automatische Optionen aus Array --}}
         @foreach($options as $value => $text)
-        <option value="{{ $value }}">{{ $text }}</option>
+            <option value="{{ $value }}">{{ $text }}</option>
         @endforeach
 
         {{-- 3. Manueller Slot (falls man optgroups oder spezielle Logik braucht) --}}
@@ -46,12 +46,12 @@ $hasError = $name && $errors->has($name);
 
     {{-- Feedback: Error oder Hint --}}
     @if($hasError)
-    <div class="invalid-feedback">
-        {{ $errors->first($name) }}
-    </div>
+        <div class="invalid-feedback">
+            {{ $errors->first($name) }}
+        </div>
     @elseif($hint)
-    <div class="form-text text-muted">
-        {{ $hint }}
-    </div>
+        <div class="form-text text-muted">
+            {{ $hint }}
+        </div>
     @endif
 </div>

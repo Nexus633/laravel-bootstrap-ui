@@ -9,6 +9,7 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\Icon;
     $noCaret = $attributes->get('no:caret') ?? $noCaret;
     $btnClasses = 'btn';
 
@@ -35,6 +36,7 @@
         default => 'dropdown'
     };
 
+    $icon = Icon::toClass($icon);
     $attributes->except(['no:caret']);
 @endphp
 

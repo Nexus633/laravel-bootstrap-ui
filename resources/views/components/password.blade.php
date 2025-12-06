@@ -5,15 +5,23 @@
     'hint' => null,
     'toggle' => true, // Soll das Auge angezeigt werden?
     'icon' => null,
-    'toggleShowIcon' => 'bi-eye-slash',
-    'toggleHideIcon' => 'bi-eye'
+    'toggleShowIcon' => 'eye-slash',
+    'toggleHideIcon' => 'eye'
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\Icon;
     $id = $attributes->get('id') ?? 'password-'. uniqid();
-    $_toggleShowIcon = $attributes->get('toggle:show') ?? $toggleShowIcon;
-    $_toggleHideIcon = $attributes->get('toggle:hide') ?? $toggleHideIcon;
+    $toggleShowIcon = $attributes->get('toggle:show') ?? $toggleShowIcon;
+    $toggleHideIcon = $attributes->get('toggle:hide') ?? $toggleHideIcon;
+
+    $toggleShowIcon = Icon::toClass($toggleShowIcon);
+    $toggleHideIcon = Icon::toClass($toggleHideIcon);
+
     $attributes = $attributes->except(['toggle:show', 'toggle:hide']);
+
+
+
 
     $hasError = $name && $errors->has($name);
 @endphp
@@ -31,7 +39,7 @@
     <div class="@if($toggle) input-group @endif {{ $hasError ? 'is-invalid' : '' }}">
         @if($icon)
             <span class="input-group-text">
-                <i class="{{ $icon }}" aria-hidden="true"></i>
+                <i class="bi bi-{{ $icon }}" aria-hidden="true"></i>
             </span>
         @endif
         {{-- Der Input --}}
@@ -53,7 +61,7 @@
                     aria-label="Passwort anzeigen"
             >
                 {{-- Icon wechselt (Auge offen / durchgestrichen) --}}
-                <i class="bi" :class="show ? '{{ $_toggleShowIcon }}' : '{{ $_toggleHideIcon }}'"></i>
+                <i class="bi " :class="show ? '{{ $toggleShowIcon }}' : '{{ $toggleHideIcon }}'"></i>
             </button>
         @endif
     </div>

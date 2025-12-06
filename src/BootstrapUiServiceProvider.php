@@ -2,10 +2,10 @@
 
 namespace Nexus633\BootstrapUi;
 
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Nexus633\BootstrapUi\Services\FlashService;
+use Nexus633\BootstrapUi\Services\IconService;
 use Nexus633\BootstrapUi\Services\ThemeService;
 use Nexus633\BootstrapUi\Services\ToastService;
 
@@ -44,6 +44,10 @@ class BootstrapUiServiceProvider extends ServiceProvider
 
         $this->app->singleton('bs-toast', function () {
             return new ToastService();
+        });
+
+        $this->app->singleton('bs-icon-service', function ($app) {
+            return new IconService();
         });
     }
 
