@@ -6,12 +6,16 @@
     'xl' => null,       // ≥ 1200px
     'xxl' => null,      // ≥ 1400px
     'order' => null,    // 0-5, first, last
+    'vAlign' => null,   // Vertikale Ausrichtung: 'start', 'center', 'end'
 ])
 
 @php
+    $vAlign = $attributes->get('align:vertical') ?? $vAlign;
+    $attributes = $attributes->except('align:vertical');
+
     $classes = [];
 
-    $hasSize = $size !== null || $sm !== null || $md !== null || $lg !== null || $xl !== null || $xxl !== null;
+    $hasSize = $size || $sm || $md || $lg || $xl || $xxl;
 
     if (!$hasSize) {
         $classes[] = 'col';
@@ -29,6 +33,12 @@
         // Erlaubt: order="1", order="first", order="last"
         $classes[] = "order-$order";
     }
+
+    // Align Self (Vertikal für DIESE Column)
+    if($vAlign !== null){
+        $classes[] = 'align-self-' . $vAlign;
+    }
+
 @endphp
 
 <div {{ $attributes->class($classes) }} {{ $attributes }}>

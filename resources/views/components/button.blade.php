@@ -6,60 +6,76 @@
     'icon' => null,
     'outline' => false,
     'dismiss' => null,
-    'relative' => false, // NEU: Damit Badges positioniert werden können
-    'align' => null         // NEU: 'right', 'block', 'center'
+    'relative' => false,
+    'align' => null,
+    'collapse' => null,
+    'offcanvas' => null // NEU: ID des Offcanvas, z.B. 'sidebarCart'
 ])
 
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
-    $id = $attributes->get('id') ?? 'btn-' . uniqid();
 
-    // Basis-Klasse
+    $id = $attributes->get('id') ?? 'btn-' . uniqid();
+    $cleanIcon = Icon::toClass($icon);
+
     $classes = 'btn';
 
-    // Logik für Outline vs Solid
-    $actualVariant = $outline && !str_contains($variant, 'outline')
-                     ? 'outline-' . $variant
-                     : $variant;
-
+    // ... (Hier die unveränderte Logik für Variant, Size, Relative, Align) ...
+    $actualVariant = $outline && !str_contains($variant, 'outline') ? 'outline-' . $variant : $variant;
     $classes .= ' btn-' . $actualVariant;
+    if ($size) $classes .= ' btn-' . $size;
+    if ($relative) $classes .= ' position-relative';
 
-    if ($size) {
-        $classes .= ' btn-' . $size;
-    }
-
-    // NEU: Position Relative für Badges
-    if ($relative) {
-        $classes .= ' position-relative';
-    }
-
-    // --- NEU: ALIGNMENT LOGIC ---
-    if ($align === 'right') {
-        // float-end ist der klassische Weg in Block-Containern (wie Card-Header)
-        $classes .= ' float-end';
-    } elseif ($align === 'block') {
-        // Volle Breite
-        $classes .= ' w-100 d-block';
-    } elseif ($align === 'center') {
-        // Zentriert (braucht d-block, da Buttons standardmäßig inline sind)
-        $classes .= ' d-block mx-auto';
-    }
+    if ($align === 'right') $classes .= ' float-end';
+    elseif ($align === 'block') $classes .= ' w-100 d-block';
+    elseif ($align === 'center') $classes .= ' d-block mx-auto';
 
     $isLink = $attributes->has('href');
     $tag = $isLink ? 'a' : 'button';
-    $icon = Icon::toClass($icon);
+
+    // Helper für Toggle Attribute
+    $extraAttrs = [];
+
+    // CASE A: COLLAPSE
+    if ($collapse) {
+        $extraAttrs['data-bs-toggle'] = 'collapse';
+        $target = (str_starts_with($collapse, '.') || str_starts_with($collapse, '#')) ? $collapse : '#' . $collapse;
+        $extraAttrs['data-bs-target'] = $target;
+        $extraAttrs['aria-expanded'] = 'false';
+        $extraAttrs['aria-controls'] = trim($target, '#.');
+        if ($isLink && !$attributes->has('href')) $extraAttrs['href'] = $target;
+    }
+
+    // CASE B: OFFCANVAS (NEU)
+    if ($offcanvas) {
+        $extraAttrs['data-bs-toggle'] = 'offcanvas';
+        // Bei Offcanvas ist es immer eine ID, Klassen funktionieren hier technisch nicht gut als Target
+        $target = str_starts_with($offcanvas, '#') ? $offcanvas : '#' . $offcanvas;
+        $extraAttrs['data-bs-target'] = $target;
+        $extraAttrs['aria-controls'] = trim($target, '#');
+        if ($isLink && !$attributes->has('href')) $extraAttrs['href'] = $target;
+    }
+
 @endphp
 
 <{{ $tag }} id="{{ $id }}"
 @if(!$isLink) type="{{ $type }}" @endif
-{{ $attributes->merge(['class' => $classes]) }}
+{{ $attributes->merge($extraAttrs)->merge(['class' => $classes]) }}
 @if($loading && !$isLink)
     wire:loading.attr="disabled" wire:target="{{ $loading }}"
 @endif
-@if($actualVariant === 'close')
+@if($dismiss)
     data-bs-dismiss="{{ $dismiss }}" aria-label="Close"
 @endif
 >
-{{-- Dein ausgelagertes Innenleben --}}
-@include('bs::components.partials.button-content')
+@if($loading)
+    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    <span class="visually-hidden">Loading...</span>
+@endif
+
+@if($cleanIcon && !$loading)
+    <i class="{{ Icon::toClass($cleanIcon) }} me-1"></i>
+@endif
+
+{{ $slot }}
 </{{ $tag }}>
