@@ -1,9 +1,3 @@
-Hallo\! Das ist ein wichtiger Schritt. Eine gute **README** dient als Aushängeschild deines Projekts und als erste Anlaufstelle für Entwickler. Sie sollte kurz und prägnant die Installation, die wichtigsten Funktionen und einen klaren Verweis auf deine ausführliche **Wiki-Dokumentation** enthalten.
-
-Hier ist der Entwurf für deine **`README.md`**, zugeschnitten auf dein Laravel/Livewire/Bootstrap-Projekt:
-
------
-
 # 🚀 `nexus633/laravel-bootstrap-ui`
 
 **Einfache, moderne Blade-Komponenten für Laravel und Livewire, basierend auf Bootstrap 5.x.**
