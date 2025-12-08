@@ -51,6 +51,71 @@
         setTheme(newTheme);
         return newTheme;
     }
+
+    document.addEventListener('alpine:init', () => {
+        Alpine.directive('tooltip', (el, { expression }, { evaluate, cleanup }) => {
+
+            // Den Text/Titel aus dem Alpine-Ausdruck holen
+            let title = evaluate(expression);
+
+            // Falls kein Text da ist, abbrechen
+            if (!title) return;
+
+            // Bootstrap Tooltip instanziieren
+            let tooltip = new bootstrap.Tooltip(el, {
+                title: title,
+
+                // Placement aus data-Attribut holen (Fallback: 'top')
+                placement: el.dataset.bsPlacement || 'top',
+
+                // HIER IST DIE ÄNDERUNG: Custom Class explizit übernehmen
+                // Wir lesen das data-Attribut, das unsere Blade-Component setzt
+                customClass: el.dataset.bsCustomClass || '',
+
+                trigger: 'hover focus',
+                html: false
+            });
+
+            // WICHTIG: Cleanup für Livewire
+            // Wenn Livewire das Element aus dem DOM wirft, zerstören wir den Tooltip
+            cleanup(() => {
+                tooltip.dispose();
+            });
+        });
+
+        Alpine.directive('popover', (el, { expression }, { evaluate, cleanup }) => {
+
+            // Optional: Falls man <span x-popover="'Mein Inhalt'"> nutzt,
+            // nehmen wir das als Content.
+            let content = expression ? evaluate(expression) : null;
+
+            // Bootstrap Konfiguration
+            const popover = new bootstrap.Popover(el, {
+                // Wenn Content im x-popover übergeben wurde, nutzen wir ihn,
+                // sonst sucht Bootstrap automatisch nach data-bs-content
+                content: content || el.dataset.bsContent,
+
+                title: el.dataset.bsTitle || '', // Überschrift
+
+                placement: el.dataset.bsPlacement || 'right',
+                customClass: el.dataset.bsCustomClass || '',
+
+                // WICHTIG: 'focus' macht das Popover "dismissible".
+                // Klickt der User woanders hin, geht es zu.
+                trigger: el.dataset.bsTrigger || 'focus',
+
+                // 'body' verhindert oft Z-Index/Overflow Probleme in Tabellen oder Cards
+                container: 'body',
+                html: false // XSS Schutz
+            });
+
+            // Livewire Cleanup
+            cleanup(() => {
+                popover.dispose();
+            });
+        });
+    });
+
 })();
 
 class BootstrapColor {

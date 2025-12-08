@@ -102,4 +102,52 @@ return [
         'base'   => 'bi',   // Standard: Bootstrap Icons
         'prefix' => 'bi-',  // Standard Prefix
     ],
+    /*
+    |--------------------------------------------------------------------------
+    | Icon Configuration
+    |--------------------------------------------------------------------------
+    |
+    */
+    'tooltip' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Standard Positionierung
+        |--------------------------------------------------------------------------
+        |
+        | Optionen: 'top', 'bottom', 'left', 'right', 'auto'
+        |
+        */
+        'position' => 'top',
+        /*
+        |--------------------------------------------------------------------------
+        | Custom CSS Klasse
+        |--------------------------------------------------------------------------
+        |
+        | Eine globale CSS-Klasse, die allen Tooltips hinzugefügt wird
+        | (z.B. für eigene Farben via Bootstrap 'custom-tooltip' SASS Variablen).
+        |
+        */
+        'custom_class' => '',
+    ],
+    'popover' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Standard Positionierung
+        |--------------------------------------------------------------------------
+        |
+        | Optionen: 'top', 'bottom', 'left', 'right', 'auto'
+        |
+        */
+        'position' => 'right',
+        /*
+        |--------------------------------------------------------------------------
+        | Custom CSS Klasse
+        |--------------------------------------------------------------------------
+        |
+        | Eine globale CSS-Klasse, die allen Popover hinzugefügt wird
+        | (z.B. für eigene Farben via Bootstrap 'custom-popover' SASS Variablen).
+        |
+        */
+        'custom_class' => '',
+    ],
 ];
