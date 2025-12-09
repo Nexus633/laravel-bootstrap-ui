@@ -32,7 +32,7 @@
     $cleanup sorgt dafür, dass keine Speicherlecks entstehen, wenn Livewire das Element entfernt.
 --}}
 <span
-    x-tooltip="'{{ $text }}'"
+    x-bs-tooltip="'{{ $text }}'"
     {{-- Diese Attribute liest unser JS jetzt explizit aus --}}
     data-bs-placement="{{ $placement }}"
 

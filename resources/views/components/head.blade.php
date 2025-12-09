@@ -11,6 +11,7 @@
     $cssUrl = $getAsset('css/bootstrap.min.css');
     $iconUrl = $getAsset('css/bootstrap-icons.min.css');
     $coreJsUrl = $getAsset('js/ui-core.js');
+    $uiAlpineJsUrl = $getAsset('js/bs-ui-alpine.js');
 
     // Server-Side Theme Check (für Session-Persistenz)
     $serverTheme = session('bs-theme');
@@ -27,3 +28,4 @@
 @endif
 
 <script src="{{ $coreJsUrl }}"></script>
+<script src="{{ $uiAlpineJsUrl }}"></script>

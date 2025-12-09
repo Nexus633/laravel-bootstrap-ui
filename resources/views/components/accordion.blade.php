@@ -1,16 +1,18 @@
 @props([
-    'flush' => false,      // true = Entfernt Rahmen (z.B. für Card-Integration)
-    'alwaysOpen' => false, // true = Items schließen sich nicht gegenseitig
+    'id' => null,
+    'flush' => false,       // true = Entfernt Rahmen (z.B. für Card-Integration)
+    'alwaysOpen' => false,  // true = Items schließen sich nicht gegenseitig
+    'persist' => false,     // true = LocalStorage, false = SessionStorage
 ])
 
 @php
-    $id = $attributes->get('id') ?? 'accordion-' . uniqid();
+    $accordionId = $id ?? 'accordion-' . uniqid();
 
-    // Klassen zusammenbauen
-    $classes = [
-        'accordion',
-        'accordion-flush' => $flush,
-    ];
+     // Klassen zusammenbauen
+     $classes = [
+         'accordion',
+         'accordion-flush' => $flush,
+     ];
 @endphp
 
 {{-- 
@@ -18,6 +20,11 @@
     WICHTIG: Die ID muss vom User übergeben werden (z.B. id="myFaq"), 
     damit @aware im Kind darauf zugreifen kann.
 --}}
-<div {{ $attributes->class($classes)  }}>
+<div
+    id="{{ $accordionId }}"
+    {{ $attributes->class($classes) }}
+    x-data="bsUiState('{{ $accordionId }}', 'accordion', {{ $persist ? 'true' : 'false' }})"
+    {{ $attributes }}
+>
     {{ $slot }}
 </div>

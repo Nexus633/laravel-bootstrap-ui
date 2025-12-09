@@ -35,7 +35,7 @@
 
 <span
     {{-- Initialisierung via Alpine --}}
-    x-popover
+    x-bs-popover
 
     {{-- Bootstrap Data Attributes --}}
     data-bs-container="body"

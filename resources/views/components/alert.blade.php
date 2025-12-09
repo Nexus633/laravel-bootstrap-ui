@@ -2,6 +2,7 @@
     'variant' => 'primary', // success, danger, warning, info
     'dismissible' => false,
     'icon' => null,
+    'iconFs' => 4
 ])
 
 @php
@@ -15,10 +16,16 @@
             'info' => 'bi bi-info-circle-fill',
             default => 'bi bi-info-circle',
         };
+
+
     }else{
         $icon = Icon::toClass($icon);
     }
-    
+
+    $iconFs = $attributes->get('icon:fs') ?? $iconFs;
+    $attributes = $attributes->except(['icon:fs']);
+
+    //if($iconFs) $iconFs = 'fs-' . $iconFs;
     // Alias Korrektur: Falls jemand 'error' statt 'danger' schreibt
     $realVariant = $variant === 'error' ? 'danger' : $variant;
 
@@ -31,8 +38,7 @@
 
 <div {{ $attributes->merge(['class' => $classes, 'role' => 'alert']) }}>
 
-    {{-- Icon --}}
-    <i class="{{ $icon }} flex-shrink-0 me-2 fs-4"></i>
+    <x-bs::icon name="{{ $icon }}" class="flex-shrink-0 me-2" size="{{ $iconFs }}" />
 
     {{-- Content Wrapper --}}
     <div>
@@ -41,6 +47,6 @@
 
     {{-- Close Button --}}
     @if($dismissible)
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <x-bs::button.close dismiss="alert" />
     @endif
 </div>

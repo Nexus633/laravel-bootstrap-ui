@@ -113,12 +113,7 @@
                     <div x-text="alert.message"></div>
                 </div>
 
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="handleRemove($el.closest('.alert'), alert.id)"
-                    aria-label="Close"
-                ></button>
+                <x-bs::button.close @click="handleRemove($el.closest('.alert'), alert.id)" />
             </div>
         </template>
     </div>
