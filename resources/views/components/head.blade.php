@@ -10,6 +10,8 @@
 
     $cssUrl = $getAsset('css/bootstrap.min.css');
     $iconUrl = $getAsset('css/bootstrap-icons.min.css');
+    $bsUrl = $getAsset('css/bootstrap-ui.css');
+
     $coreJsUrl = $getAsset('js/ui-core.js');
     $uiAlpineJsUrl = $getAsset('js/bs-ui-alpine.js');
 
@@ -20,6 +22,8 @@
 <link href="{{ $cssUrl }}" rel="stylesheet">
 
 <link href="{{ $iconUrl }}" rel="stylesheet">
+
+<link href="{{ $bsUrl }}" rel="stylesheet">
 
 @if($serverTheme)
     <script>

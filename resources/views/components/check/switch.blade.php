@@ -1,1 +1,1 @@
-<x-bs::check.base type="checkbox" :is-switch="true" {{ $attributes }} />
+<x-bs::check.base type="checkbox" :switch="true" {{ $attributes }} />

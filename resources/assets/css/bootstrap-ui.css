@@ -175,3 +175,63 @@
 .alert-no-animation {
     animation: none !important;
 }
+
+/* --- STICKY TABLE CSS --- */
+
+/* 1. Layout Reset für Sticky (zwingend erforderlich) */
+table[x-data="bsTableSticky"] {
+    border-collapse: separate !important;
+    border-spacing: 0;
+}
+
+/* 2. Basis-Styling für Sticky Zellen */
+.table-sticky-cell {
+    position: sticky !important;
+    position: -webkit-sticky !important;
+    z-index: 2;
+    background-clip: padding-box;
+    background-color: var(--bs-table-bg, #fff) !important;
+    box-shadow: inset -1px 0 0 rgba(0,0,0,0.1);
+}
+
+/* 3. Header Sticky Zellen (höherer z-index) */
+thead .table-sticky-cell {
+    z-index: 5 !important;
+    background-color: var(--bs-table-bg, #f8f9fa) !important;
+}
+
+/* 4. Footer Sticky Zellen (höherer z-index) */
+tfoot .table-sticky-cell {
+    z-index: 10 !important;
+    background-color: var(--bs-table-bg, #fff) !important;
+    border-top: 2px solid var(--bs-border-color);
+}
+
+/* 5. Striped Rows Fix (transparente Farbe als Overlay) */
+.table-striped > tbody > tr:nth-of-type(odd) > .table-sticky-cell {
+    background-color: var(--bs-table-bg, #fff) !important;
+    background-image: linear-gradient(var(--bs-table-striped-bg), var(--bs-table-striped-bg)) !important;
+}
+
+/* 6. Hover Rows Fix (transparente Farbe als Overlay) */
+.table-hover > tbody > tr:hover > .table-sticky-cell {
+    background-color: var(--bs-table-bg, #fff) !important;
+    background-image: linear-gradient(var(--bs-table-hover-bg), var(--bs-table-hover-bg)) !important;
+}
+
+/* 7. Dark Mode Support */
+.table-dark .table-sticky-cell {
+    background-color: var(--bs-body-bg, #212529) !important;
+    box-shadow: inset -1px 0 0 rgba(255,255,255,0.1);
+}
+
+.table-dark tfoot .table-sticky-cell {
+    background-color: var(--bs-body-bg, #212529) !important;
+}
+
+/* 8. Header mit Variant-Klassen (z.B. table-danger) */
+thead[class*="table-"] .table-sticky-cell,
+th[class*="table-"].table-sticky-cell {
+    background-image: none !important;
+    opacity: 1 !important;
+}

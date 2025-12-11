@@ -11,7 +11,6 @@
         return route('bs-ui.asset', ['path' => $path]);
     };
 
-    $bsUrl = $getAsset('js/bootstrap-ui.js');
     $bsUrl = $getAsset('js/bootstrap.bundle.min.js');
     $chartUrl = $charts ? $getAsset('js/chart.umd.js') : null;
 @endphp

@@ -1,5 +1,5 @@
 @props([
-    'type' => 'danger',      // Farbe (danger, primary, etc.)
+    'variant' => 'danger',      // Farbe (danger, primary, etc.)
     'pill' => false,         // Runde Ecken (rounded-pill)
     'dot' => false,          // Kleiner Punkt ohne Text
     'border' => false,       // Weißer Rand zur Abgrenzung
@@ -21,7 +21,7 @@
         'p-2 rounded-circle' => $dot, // Dot braucht Padding um rund zu sein
 
         // Farben (Text-Bg für Kontrast bei Text, nur BG bei Dots)
-        ($dot ? 'bg-' : 'text-bg-') . $type,
+        ($dot ? 'bg-' : 'text-bg-') . $variant,
 
         // Styles
         'rounded-pill' => $pill && !$dot,

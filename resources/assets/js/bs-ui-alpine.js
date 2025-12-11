@@ -131,49 +131,109 @@ function registerAlpineFunctions() {
         }
     }));
 
-    Alpine.data('bsModal', (id, wireModel = null) => ({
-        modalInstance: null,
-
+    Alpine.data('bsTableSticky', () => ({
         init() {
-            const el = this.$el;
+            this.updateSticky();
+            window.addEventListener('resize', () => this.updateSticky());
 
-            // 1. Bootstrap Modal Instanz erstellen
-            this.modalInstance = new bootstrap.Modal(el);
-
-            // 2. Listener für "Wire:Model" (Server steuert Modal)
-            if (wireModel !== null) {
-                this.$watch('wireModel', (value) => {
-                    if (value) this.modalInstance.show();
-                    else this.modalInstance.hide();
+            if (typeof Livewire !== 'undefined') {
+                Livewire.hook('commit', ({ succeed }) => {
+                    succeed(() => this.$nextTick(() => this.updateSticky()));
                 });
             }
+        },
 
-            // 3. Listener für Service Events (Modal::open('id'))
-            // Wir hören auf das window event
-            window.addEventListener('bs-modal-show', (event) => {
-                if (event.detail.id === id) {
-                    this.modalInstance.show();
+        updateSticky() {
+            const table = this.$el;
+            const rows = table.querySelectorAll('tr');
+            if (rows.length === 0) return;
+
+            // 1. Header analysieren - welche SPALTEN sind sticky?
+            const stickyIndices = new Set();
+            const headerCells = table.querySelectorAll('thead tr:first-child th');
+            let colIdx = 0;
+
+            headerCells.forEach((cell) => {
+                const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+
+                // ✅ Nur Zellen OHNE colspan werden sticky
+                if (colspan === 1 && cell.hasAttribute('data-sticky')) {
+                    stickyIndices.add(colIdx);
                 }
+
+                colIdx += colspan;
             });
 
-            window.addEventListener('bs-modal-hide', (event) => {
-                if (event.detail.id === id) {
-                    this.modalInstance.hide();
-                }
-            });
+            // 2. Alle Zeilen verarbeiten
+            rows.forEach((row) => {
+                const cells = Array.from(row.children);
+                const parentTag = row.parentElement.tagName;
 
-            // 4. Bootstrap Events an Livewire zurückmelden
-            // Wenn User ESC drückt oder Backdrop klickt -> Wire Model auf false setzen
-            el.addEventListener('hidden.bs.modal', () => {
-                if (wireModel !== null) {
-                    this.wireModel = false;
-                }
-            });
+                // Spaltenbreiten Map erstellen
+                const columnWidths = new Map();
+                let realColumnIndex = 0;
 
-            el.addEventListener('shown.bs.modal', () => {
-                if (wireModel !== null) {
-                    this.wireModel = true;
-                }
+                cells.forEach((cell) => {
+                    const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+                    const cellWidth = cell.getBoundingClientRect().width;
+                    const widthPerColumn = cellWidth / colspan;
+
+                    for (let i = 0; i < colspan; i++) {
+                        columnWidths.set(realColumnIndex + i, widthPerColumn);
+                    }
+                    realColumnIndex += colspan;
+                });
+
+                // Sticky Position setzen
+                realColumnIndex = 0;
+
+                cells.forEach((cell) => {
+                    const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+                    const isExplicitSticky = cell.hasAttribute('data-sticky');
+
+                    // ✅ REGEL: Ignoriere alle Zellen mit colspan > 1
+                    if (colspan > 1) {
+                        // Reset: Kein Sticky für colspan-Zellen
+                        cell.style.left = '';
+                        cell.style.position = '';
+                        cell.style.zIndex = '';
+                        cell.classList.remove('table-sticky-cell');
+
+                        realColumnIndex += colspan;
+                        return; // Nächste Zelle
+                    }
+
+                    // Nur für colspan=1: Prüfe ob sticky
+                    const shouldBeSticky = isExplicitSticky || stickyIndices.has(realColumnIndex);
+
+                    if (shouldBeSticky) {
+                        // Berechne left-Offset: Summe aller sticky Spalten VOR dieser Zelle
+                        let leftOffset = 0;
+                        for (let col = 0; col < realColumnIndex; col++) {
+                            if (stickyIndices.has(col)) {
+                                leftOffset += (columnWidths.get(col) || 0);
+                            }
+                        }
+
+                        cell.style.left = leftOffset + 'px';
+                        cell.style.position = 'sticky';
+                        cell.classList.add('table-sticky-cell');
+
+                        // Z-Index nach Parent
+                        if (parentTag === 'THEAD') cell.style.zIndex = '5';
+                        else if (parentTag === 'TFOOT') cell.style.zIndex = '3';
+                        else cell.style.zIndex = '2';
+
+                    } else {
+                        // Reset
+                        cell.style.left = '';
+                        cell.style.position = '';
+                        cell.style.zIndex = '';
+                        cell.classList.remove('table-sticky-cell');
+                    }
+
+                    realColumnIndex += colspan;
+                });
             });
         }
     }));

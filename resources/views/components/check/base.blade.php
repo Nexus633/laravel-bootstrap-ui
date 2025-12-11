@@ -1,49 +1,56 @@
 @props([
     'name',
     'label' => null,
-    'type' => 'checkbox',  // checkbox oder radio
+    'type' => 'checkbox',  // 'checkbox' oder 'radio'
     'value' => 1,
     'checked' => false,
     'inline' => false,
+    'switch' => false,     // Kürzer als isSwitch
     'hint' => null,
-    'isSwitch' => false,   // Spezieller Trigger für Switch-Styling
+    'id' => null,
 ])
 
 @php
-    $wireModel = $attributes->wire('model');
-    
-    // ID-Generierung: Zentralisiert für alle Typen
-    $id = $attributes->get('id') ?? 'chk' . '-' . uniqid();
-    
+    $id = $id ?? 'check-' . uniqid();
     $hasError = $name && $errors->has($name);
 
-    // Wrapper Klassen Logik
-    $wrapperClass = 'form-check';
-    
-    if ($isSwitch) {
-        $wrapperClass .= ' form-switch';
-    }
-    
-    if ($inline) {
-        $wrapperClass .= ' form-check-inline';
-    } else {
-        // mb-3 nur wenn NICHT inline (sieht sonst komisch aus)
-        // Bei Radios ist mb-1 oft besser, aber wir standardisieren hier auf mb-3 für Konsistenz
-        $wrapperClass .= ' mb-3'; 
-    }
+    // 1. Wrapper Klassen (Array Logik)
+    $wrapperClasses = [
+        'form-check',
+        $switch ? 'form-switch' : null,
+        $inline ? 'form-check-inline' : null,
+        !$inline ? 'mb-3' : null, // Abstand nur, wenn nicht inline
+        // Wenn Inline, setzen wir min-height, damit es sauber ausrichtet
+        $inline ? 'd-inline-flex align-items-center' : null
+    ];
+
+    // 2. Input Klassen
+    $inputClasses = [
+        'form-check-input',
+        $hasError ? 'is-invalid' : null,
+    ];
+
+    // 3. Arrays zu Strings wandeln
+    $wrapperClassString = implode(' ', array_filter($wrapperClasses));
+    $inputClassString   = implode(' ', array_filter($inputClasses));
 @endphp
 
-<div class="{{ $wrapperClass }}">
+<div class="{{ $wrapperClassString }}">
     <input
             type="{{ $type }}"
             name="{{ $name }}"
-            value="{{ $value }}"
             id="{{ $id }}"
-            @if($isSwitch) role="switch" @endif
-            @if($checked && !$wireModel->value()) checked @endif
-            {{-- Wir mergen die Attribute hier, damit wire:model etc. ankommen --}}
-            {{ $attributes->class(['form-check-input', 'is-invalid' => $hasError]) }}
-    >
+            value="{{ $value }}"
+
+            {{-- Merge Input Klassen --}}
+            {{ $attributes->class($inputClassString) }}
+
+            {{-- Switch Rolle für Accessibility --}}
+            @if($switch) role="switch" @endif
+
+            {{-- Standard HTML Checked state (Livewire ignoriert das, wenn wire:model da ist) --}}
+            @if($checked) checked @endif
+    />
 
     @if($label)
         <label class="form-check-label" for="{{ $id }}">
@@ -51,13 +58,10 @@
         </label>
     @endif
 
+    {{-- Error & Hint MÜSSEN innerhalb von form-check stehen --}}
     @if($hasError)
-        <div class="invalid-feedback">
-            {{ $errors->first($name) }}
-        </div>
+        <div class="invalid-feedback">{{ $errors->first($name) }}</div>
     @elseif($hint)
-        <div class="form-text text-muted">
-            {{ $hint }}
-        </div>
+        <div class="form-text">{{ $hint }}</div>
     @endif
 </div>

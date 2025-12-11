@@ -1,30 +1,20 @@
 @props([
-    'label' => null, // Optionales Label über der ganzen Gruppe
-    'size' => null,  // sm, lg
-    'name' => null,  // Für Error-Handling der gesamten Gruppe
+    'label' => null,
+    'name' => null, // Optional: Feldname für Error-Anzeige unter der gesamten Gruppe
+    'hint' => null,
+    'id' => null,
+    'size' => null,
 ])
 
 @php
-    $classes = 'input-group';
-    if ($size) $classes .= ' input-group-' . $size;
-    // Falls ein Input in der Gruppe einen Fehler hat, kann man die Klasse hier setzen, 
-    // aber meistens setzt Bootstrap .is-invalid direkt am Input.
-    $hasError = $name && $errors->has($name);
-    if ($hasError) $classes .= ' has-validation'; // Bootstrap Validation Fix
+    $id = $id ?? 'group-' . uniqid();
 @endphp
 
-<div class="mb-3">
-    @if($label)
-        <label class="form-label">{{ $label }}</label>
-    @endif
+{{-- Wir nutzen denselben Wrapper, damit Labels & Errors konsistent aussehen --}}
+<x-bs::input.wrapper :label="$label" :id="$id" :name="$name" :hint="$hint">
 
-    <div {{ $attributes->merge(['class' => $classes]) }}>
+    <x-bs::input.group :size="$size" {{ $attributes }}>
         {{ $slot }}
-    </div>
+    </x-bs::input.group>
 
-    @if($hasError)
-        <div class="invalid-feedback d-block">
-            {{ $errors->first($name) }}
-        </div>
-    @endif
-</div>
+</x-bs::input.wrapper>
