@@ -237,6 +237,343 @@ function registerAlpineFunctions() {
             });
         }
     }));
+
+    Alpine.data('bsDatePicker', ({ model, min, max, mode, disable, months, days, double }) => ({
+            show: false,
+            value: model,
+            mode: mode,
+            double: double,
+            disabledDates: disable ?? [],
+
+            rangeFrom: null,
+            rangeTo: null,
+            hoverDate: null,
+
+            view: 'days',
+            placement: 'bottom',
+            cursorMonth: '',
+            cursorYear: '',
+            calendars: [],
+            yearsList: [],
+            monthNames: months,
+            dayNames: days,
+
+            init() {
+                let today = new Date();
+
+                if (this.mode === 'range') {
+                    if (this.value && typeof this.value === 'object') {
+                        this.rangeFrom = this.value.start;
+                        this.rangeTo = this.value.end;
+                    }
+                    this.initDate(this.rangeFrom || today);
+                } else {
+                    this.initDate(this.value || today);
+                }
+
+                this.$watch('value', val => {
+                    if (this.mode === 'single') this.initDate(val || new Date());
+                });
+            },
+
+            initDate(val) {
+                let d = new Date(val);
+                if (isNaN(d.getTime())) d = new Date();
+                this.cursorMonth = d.getMonth();
+                this.cursorYear = d.getFullYear();
+                this.updateCalendars();
+            },
+
+            updateCalendars() {
+                this.calendars = [];
+                let count = this.double ? 2 : 1;
+
+                for (let i = 0; i < count; i++) {
+                    let m = this.cursorMonth + i;
+                    let y = this.cursorYear;
+                    if (m > 11) { m -= 12; y++; }
+
+                    this.calendars.push({
+                        month: m,
+                        year: y,
+                        monthName: this.monthNames[m],
+                        ...this.calculateDays(m, y)
+                    });
+                }
+            },
+
+            calculateDays(month, year) {
+                let firstDayOfMonth = new Date(year, month, 1).getDay();
+                let jsDayToMonStart = (day) => (day === 0 ? 6 : day - 1);
+                let firstDayIndex = jsDayToMonStart(firstDayOfMonth);
+                let daysCount = new Date(year, month + 1, 0).getDate();
+
+                return {
+                    blankDays: new Array(firstDayIndex),
+                    days: new Array(daysCount).fill().map((_, i) => i + 1)
+                };
+            },
+
+            toggle() {
+                this.show = !this.show;
+                if (this.show) {
+                    this.updatePlacement();
+                    this.view = 'days';
+                    if (this.mode === 'single' && !this.value) this.initDate(new Date());
+                    if (this.mode === 'range' && !this.rangeFrom) this.initDate(new Date());
+                } else {
+                    this.hoverDate = null;
+                }
+            },
+            close() { this.show = false; this.hoverDate = null; },
+
+            updatePlacement() {
+                this.$nextTick(() => {
+                    const rect = this.$el.getBoundingClientRect();
+                    this.placement = rect.top > 380 ? 'top' : 'bottom';
+                });
+            },
+
+            // --- HELPERS ---
+            getDateStr(day, month, year) {
+                let d = new Date(year, month, day);
+                return this.formatDate(d);
+            },
+            formatDate(date) {
+                let offset = date.getTimezoneOffset();
+                date = new Date(date.getTime() - (offset * 60 * 1000));
+                return date.toISOString().split('T')[0];
+            },
+            formatHuman(dateStr) {
+                let date = new Date(dateStr);
+                if (isNaN(date.getTime())) return dateStr;
+                return date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            },
+
+            selectDate(day, month, year) {
+                let dateStr = this.getDateStr(day, month, year);
+                if (this.mode === 'range') {
+                    if (!this.rangeFrom || (this.rangeFrom && this.rangeTo)) {
+                        this.rangeFrom = dateStr; this.rangeTo = null;
+                    } else if (this.rangeFrom && !this.rangeTo) {
+                        if (dateStr < this.rangeFrom) {
+                            this.rangeTo = this.rangeFrom; this.rangeFrom = dateStr;
+                        } else { this.rangeTo = dateStr; }
+                        this.value = { start: this.rangeFrom, end: this.rangeTo };
+                        this.close();
+                    }
+                } else {
+                    this.value = dateStr;
+                    this.close();
+                }
+            },
+
+            isSelected(day, month, year) {
+                const dStr = this.getDateStr(day, month, year);
+                if (this.mode === 'range') return dStr === this.rangeFrom || dStr === this.rangeTo;
+                return dStr === this.value;
+            },
+            isInRange(day, month, year) {
+                if (this.mode !== 'range' || !this.rangeFrom || !this.rangeTo) return false;
+                const dStr = this.getDateStr(day, month, year);
+                return dStr > this.rangeFrom && dStr < this.rangeTo;
+            },
+            isHoverRange(day, month, year) {
+                if (this.mode !== 'range' || !this.rangeFrom || this.rangeTo || !this.hoverDate) return false;
+                const dStr = this.getDateStr(day, month, year);
+                if (this.hoverDate < this.rangeFrom) return dStr >= this.hoverDate && dStr < this.rangeFrom;
+                return dStr > this.rangeFrom && dStr <= this.hoverDate;
+            },
+            isToday(day, month, year) {
+                const today = new Date();
+                return today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+            },
+            isDisabled(day, month, year) {
+                const dStr = this.getDateStr(day, month, year);
+                const dayOfWeek = new Date(year, month, day).getDay();
+                if (min && dStr < min) return true;
+                if (max && dStr > max) return true;
+                return this.disabledDates.some(rule => {
+                    if (typeof rule === 'string') return rule === dStr;
+                    if (typeof rule === 'number') return rule === dayOfWeek;
+                    if (typeof rule === 'object' && rule.from && rule.to) return dStr >= rule.from && dStr <= rule.to;
+                    return false;
+                });
+            },
+
+            prevPage() {
+                if (this.view === 'days') {
+                    this.cursorMonth--;
+                    if (this.cursorMonth < 0) { this.cursorMonth = 11; this.cursorYear--; }
+                    this.updateCalendars();
+                } else { this.cursorYear -= 12; this.generateYears(); }
+            },
+            nextPage() {
+                if (this.view === 'days') {
+                    this.cursorMonth++;
+                    if (this.cursorMonth > 11) { this.cursorMonth = 0; this.cursorYear++; }
+                    this.updateCalendars();
+                } else { this.cursorYear += 12; this.generateYears(); }
+            },
+            toggleView() { this.view = (this.view === 'days') ? 'years' : 'days'; if(this.view === 'years') this.generateYears(); },
+            selectYear(y) { this.cursorYear = y; this.view = 'days'; this.updateCalendars(); },
+            generateYears() {
+                let startYear = this.cursorYear - 6;
+                this.yearsList = Array.from({ length: 12 }, (_, i) => startYear + i);
+            },
+            gotoToday() {
+                let today = new Date();
+                this.initDate(today);
+                if(this.mode === 'single') {
+                    this.value = this.getDateStr(today.getDate(), today.getMonth(), today.getFullYear());
+                    this.close();
+                }
+            },
+            get formattedDate() {
+                if (this.mode === 'range') {
+                    if (!this.rangeFrom) return '';
+                    let start = this.formatHuman(this.rangeFrom);
+                    if (!this.rangeTo) return start;
+                    return start + ' - ' + this.formatHuman(this.rangeTo);
+                }
+                if (!this.value) return '';
+                if (typeof this.value === 'object') return '';
+                return this.formatHuman(this.value);
+            },
+            // Getter für Separate Inputs
+            get startDisplay() { return this.rangeFrom ? this.formatHuman(this.rangeFrom) : ''; },
+            get endDisplay() { return this.rangeTo ? this.formatHuman(this.rangeTo) : ''; }
+        }));
+
+    Alpine.data('bsTimePicker', ({ model, min, max, interval, mode, disable, format }) => ({
+        show: false,
+        value: model,
+        mode: mode,
+        min: min,
+        max: max,
+        interval: interval,
+        format: format,
+        disabledTimes: disable ?? [],
+        rangeFrom: null,
+        rangeTo: null,
+        hoverTime: null,
+        placement: 'bottom',
+        timeSlots: [],
+
+        init() {
+            this.generateSlots();
+            if (this.mode === 'range') {
+                if (this.value && typeof this.value === 'object') {
+                    this.rangeFrom = this.value.start;
+                    this.rangeTo = this.value.end;
+                } else if (this.value && typeof this.value === 'string' && this.value.includes(' to ')) {
+                    let parts = this.value.split(' to ');
+                    this.rangeFrom = parts[0];
+                    this.rangeTo = parts[1];
+                }
+            }
+            this.$watch('show', val => {
+                if (val) { this.updatePlacement(); this.scrollToSelected(); }
+                else { this.hoverTime = null; }
+            });
+        },
+
+        toggle() { this.show = !this.show; },
+        close() { this.show = false; this.hoverTime = null; },
+
+        generateSlots() {
+            this.timeSlots = [];
+            let current = this.parseTime(this.min);
+            let end = this.parseTime(this.max);
+            let guard = 0;
+            while (current <= end && guard < 1440) {
+                let val = this.formatTime24(current);
+                let lbl = this.formatDisplay(current);
+                this.timeSlots.push({ value: val, label: lbl });
+                current.setMinutes(current.getMinutes() + this.interval);
+                guard += this.interval;
+            }
+        },
+
+        selectTime(time) {
+            if (this.isDisabled(time)) return;
+            if (this.mode === 'range') {
+                if (!this.rangeFrom || (this.rangeFrom && this.rangeTo)) {
+                    this.rangeFrom = time; this.rangeTo = null;
+                } else if (this.rangeFrom && !this.rangeTo) {
+                    if (time < this.rangeFrom) { this.rangeTo = this.rangeFrom; this.rangeFrom = time; }
+                    else { this.rangeTo = time; }
+                    this.value = { start: this.rangeFrom, end: this.rangeTo };
+                    this.close();
+                }
+            } else { this.value = time; this.close(); }
+        },
+
+        isSelected(time) {
+            if (this.mode === 'range') return time === this.rangeFrom || time === this.rangeTo;
+            return time === this.value;
+        },
+        isInRange(time) {
+            if (this.mode !== 'range' || !this.rangeFrom || !this.rangeTo) return false;
+            return time > this.rangeFrom && time < this.rangeTo;
+        },
+        isHoverRange(time) {
+            if (this.mode !== 'range' || !this.rangeFrom || this.rangeTo || !this.hoverTime) return false;
+            if (this.hoverTime < this.rangeFrom) return time >= this.hoverTime && time < this.rangeFrom;
+            return time > this.rangeFrom && time <= this.hoverTime;
+        },
+        isDisabled(time) {
+            return this.disabledTimes.some(rule => {
+                if (typeof rule === 'string') return rule === time;
+                if (typeof rule === 'object' && rule.from && rule.to) return time >= rule.from && time <= rule.to;
+                return false;
+            });
+        },
+        updatePlacement() {
+            this.$nextTick(() => {
+                const rect = this.$el.getBoundingClientRect();
+                this.placement = rect.top > 350 ? 'top' : 'bottom';
+            });
+        },
+        scrollToSelected() {
+            this.$nextTick(() => {
+                const activeEl = this.$refs.list.querySelector('.active');
+                if (activeEl) activeEl.scrollIntoView({ block: 'center' });
+            });
+        },
+        parseTime(timeStr) {
+            let [h, m] = timeStr.split(':');
+            let d = new Date(); d.setHours(h); d.setMinutes(m); d.setSeconds(0); return d;
+        },
+        formatDisplay(date) {
+            if (this.format === '12') {
+                let h = date.getHours(); let m = date.getMinutes().toString().padStart(2, '0');
+                let ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12; h = h ? h : 12;
+                return `${h}:${m} ${ampm}`;
+            }
+            return this.formatTime24(date);
+        },
+        formatTime24(date) {
+            let h = date.getHours().toString().padStart(2, '0'); let m = date.getMinutes().toString().padStart(2, '0');
+            return `${h}:${m}`;
+        },
+        formatString(timeStr) {
+            if (!timeStr) return '';
+            let d = this.parseTime(timeStr);
+            return this.formatDisplay(d);
+        },
+        get formattedValue() {
+            if (this.mode === 'range') {
+                if (!this.rangeFrom) return '';
+                let start = this.formatString(this.rangeFrom);
+                if (!this.rangeTo) return start;
+                return `${start} - ${this.formatString(this.rangeTo)}`;
+            }
+            return this.formatString(this.value);
+        },
+        get startDisplay() { return this.formatString(this.rangeFrom); },
+        get endDisplay() { return this.formatString(this.rangeTo); }
+    }));
 }
 
 

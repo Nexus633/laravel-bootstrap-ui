@@ -16,11 +16,16 @@ class BootstrapUiServiceProvider extends ServiceProvider
     {
         // Views registrieren
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'bs');
+        // Translation registrieren
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'bs');
 
 
-        $this->bootPublishes();
         $this->bootRoutes();
         $this->bootBladeDirective();
+
+        if ($this->app->runningInConsole()) {
+            $this->bootPublishes();
+        }
     }
 
     public function register(): void
@@ -65,6 +70,10 @@ class BootstrapUiServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/bootstrap-ui.php' => config_path('bootstrap-ui.php'),
         ], 'bootstrap-ui-config'); // Neuer Tag!
+
+        $this->publishes([
+            __DIR__.'/../resources/lang' => resource_path('lang/vendor/bs'),
+        ], 'bootstrap-ui-lang');
     }
     private function bootRoutes(): void
     {

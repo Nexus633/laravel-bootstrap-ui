@@ -235,3 +235,17 @@ th[class*="table-"].table-sticky-cell {
     background-image: none !important;
     opacity: 1 !important;
 }
+
+/* Macht das native Kalender-Icon im Input deutlicher klickbar */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    /* Optional: Etwas abdunkeln für besseren Kontrast */
+    filter: invert(0.5);
+}
+
+/* Dark Mode Support für das Icon */
+[data-bs-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-bs-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
