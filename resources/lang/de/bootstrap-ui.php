@@ -30,5 +30,16 @@ return [
             'to' => 'bis',
             'select_time' => 'Zeit wählen'
         ]
+    ],
+    'file-upload' => [
+        'label' => 'Datei hochladen',
+        'zone' => [
+            'label' => 'Datei hier ablegen oder klicken',
+            'accept' => 'Zulässig:',
+            'accept_all' => 'Alle Dateitypen'
+        ],
+        'simple' => [
+            'upload' => 'Wird hochgeladen...'
+        ],
     ]
 ];

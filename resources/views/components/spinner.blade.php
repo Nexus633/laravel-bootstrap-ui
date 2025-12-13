@@ -19,6 +19,6 @@
     }
 @endphp
 
-<div role="status" {{ $attributes->class($classes) }}>
+<div role="status" {{ $attributes->class($classes) }} aria-hidden="true">
     <span class="visually-hidden">{{ $label }}</span>
 </div>

@@ -69,12 +69,11 @@
 @endif
 >
 @if($loading)
-    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-    <span class="visually-hidden">Loading...</span>
+    <x-bs::spinner type="border" size="sm" label="Loading..."/>
 @endif
 
 @if($cleanIcon && !$loading)
-    <i class="{{ Icon::toClass($cleanIcon) }} me-1"></i>
+    <x-bs::icon :name="$cleanIcon" class="me-1" />
 @endif
 
 {{ $slot }}

@@ -574,6 +574,101 @@ function registerAlpineFunctions() {
         get startDisplay() { return this.formatString(this.rangeFrom); },
         get endDisplay() { return this.formatString(this.rangeTo); }
     }));
+
+    Alpine.data('bsFileUpload', ({ name, id, multiple }) => ({
+        isDropping: false,
+        isUploading: false,
+        progress: 0,
+        // NEU: Zähler für die Anzeige
+        currentIndex: 0,
+        totalFiles: 0,
+
+        name: name,
+        inputId: id,
+        multiple: multiple,
+
+        init() {
+            // Keine Event-Listener mehr nötig für sequenziellen Upload
+        },
+
+        trigger() {
+            const input = document.getElementById(this.inputId);
+            if (input) input.click();
+        },
+
+        onDragOver(e) {
+            e.preventDefault();
+            this.isDropping = true;
+        },
+
+        onDragLeave(e) {
+            e.preventDefault();
+            this.isDropping = false;
+        },
+
+        onDrop(e) {
+            e.preventDefault();
+            this.isDropping = false;
+            let files = e.dataTransfer.files;
+            if (files.length > 0) this.uploadFiles(files);
+        },
+
+        handleFileSelect(e) {
+            if (e.target.files.length > 0) {
+                this.uploadFiles(e.target.files);
+            }
+        },
+
+        async uploadFiles(fileList) {
+            this.isUploading = true;
+            this.progress = 0;
+
+            const files = Array.from(fileList);
+            const input = document.getElementById(this.inputId);
+
+            // NEU: Gesamtanzahl setzen
+            this.totalFiles = files.length;
+            this.currentIndex = 0;
+
+            let currentCount = 0;
+            if (this.multiple) {
+                let currentData = await this.$wire.get(this.name);
+                currentCount = Array.isArray(currentData) ? currentData.length : 0;
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                // NEU: Aktuellen Schritt setzen (1-basiert)
+                this.currentIndex = i + 1;
+
+                const file = files[i];
+                const targetName = this.multiple
+                    ? this.name + '.' + (currentCount + i)
+                    : this.name;
+
+                await new Promise((resolve) => {
+                    this.$wire.upload(
+                        targetName,
+                        file,
+                        () => resolve(),
+                        () => resolve(), // Bei Fehler weitermachen
+                        (event) => {
+                            this.progress = event.detail.progress;
+                        }
+                    );
+                });
+
+                this.progress = 0;
+            }
+
+            this.isUploading = false;
+            this.progress = 0;
+            // Reset Zähler
+            this.currentIndex = 0;
+            this.totalFiles = 0;
+
+            if(input) input.value = '';
+        }
+    }));
 }
 
 

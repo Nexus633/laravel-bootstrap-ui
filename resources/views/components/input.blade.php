@@ -2,6 +2,7 @@
     'name',
     'label' => null,
     'type' => 'text',
+    'multiple' => false,
     'hint' => null,
     'prepend' => null,
     'append' => null,
@@ -33,15 +34,21 @@
 
     // Check: Brauchen wir eine Input-Group?
     $hasGroup = ($prepend || $append || $iconPrepend || $iconAppend);
+
+    if($multiple && $type !== 'file'){
+        $multiple = false;
+    }
+
 @endphp
 
 @if($simple)
     {{-- RAW MODE: Nur der Tag (für Nutzung IN Gruppen) --}}
     <input
-            id="{{ $id }}"
-            type="{{ $type }}"
-            name="{{ $name }}"
-            {{ $attributes->class($inputClasses) }}
+        id="{{ $id }}"
+        type="{{ $type }}"
+        name="{{ $name }}"
+        @if($multiple) multiple @endif
+        {{ $attributes->class($inputClasses) }}
     />
 @else
     {{-- WRAPPER MODE: Standard Nutzung --}}
@@ -53,39 +60,39 @@
 
                 {{-- Prepend --}}
                 @if($prepend || $iconPrepend)
-                    <span class="input-group-text">
+                    <x-bs::input-group.text>
                          @if($iconPrepend) <i class="{{ $iconPrepend }}"></i> @else {!! $prepend !!} @endif
-                    </span>
+                    </x-bs::input-group.text>
                 @endif
 
                 {{-- Input (ggf. Floating inside Group) --}}
                 @if($isFloating)
                     <div class="form-floating {{ $hasError ? 'is-invalid' : '' }}">
-                        <input id="{{ $id }}" type="{{ $type }}" name="{{ $name }}" placeholder="{{ $label }}" {{ $attributes->class($inputClasses) }} />
+                        <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" placeholder="{{ $label }}" {{ $attributes->class($inputClasses) }} />
                         <label for="{{ $id }}">{{ $label }}</label>
                     </div>
                 @else
-                    <input id="{{ $id }}" type="{{ $type }}" name="{{ $name }}" {{ $attributes->class($inputClasses) }} />
+                    <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" {{ $attributes->class($inputClasses) }} />
                 @endif
 
                 {{-- Append --}}
                 @if($append || $iconAppend)
-                    <span class="input-group-text">
+                    <x-bs::input-group.text>
                         @if($iconAppend) <i class="{{ $iconAppend }}"></i> @else {!! $append !!} @endif
-                    </span>
+                    </x-bs::input-group.text>
                 @endif
             </x-bs::input.group>
 
         @elseif($isFloating)
             {{-- OPTION B: PURE FLOATING --}}
             <div class="form-floating {{ $hasError ? 'is-invalid' : '' }}">
-                <input id="{{ $id }}" type="{{ $type }}" name="{{ $name }}" placeholder="{{ $label }}" {{ $attributes->class($inputClasses) }} />
+                <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" placeholder="{{ $label }}" {{ $attributes->class($inputClasses) }} />
                 <label for="{{ $id }}">{{ $label }}</label>
             </div>
 
         @else
             {{-- OPTION C: STANDARD INPUT --}}
-            <input id="{{ $id }}" type="{{ $type }}" name="{{ $name }}" {{ $attributes->class($inputClasses) }} />
+            <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" {{ $attributes->class($inputClasses) }} />
         @endif
 
     </x-bs::input.wrapper>
