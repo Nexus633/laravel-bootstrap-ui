@@ -252,3 +252,9 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .border-dashed { border-style: dashed !important; }
 .transition-colors { transition: background-color 0.2s, border-color 0.2s; }
+
+.transition-base { transition: all 0.2s ease-in-out; }
+.hover-bg-body-secondary:hover {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-body-emphasis) !important;
+}

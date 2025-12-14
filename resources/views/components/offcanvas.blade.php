@@ -1,20 +1,24 @@
 @props([
-    'id',                  // PFLICHT
-    'title' => null,       // Titel im Header
-    'placement' => 'start',// start, end, top, bottom
-    'backdrop' => true,    // true, false, 'static'
-    'scroll' => false,     // true = Body scrollt weiter
+    'id',
+    'title' => null,
+    'placement' => 'start',
+    'backdrop' => true,
+    'scroll' => false,
+    'responsive' => null, // z.B. 'lg'
 ])
 
 @php
+    // Basis-Klasse ermitteln (offcanvas vs offcanvas-lg)
+    $baseClass = $responsive ? 'offcanvas-' . $responsive : 'offcanvas';
+
     $classes = [
-        'offcanvas',
+        $baseClass,
         'offcanvas-' . $placement,
     ];
 
-    // Data Attribute für Optionen bauen
     $dataAttrs = [];
-    
+
+    // Backdrop Logik
     if ($backdrop === 'static') {
         $dataAttrs['data-bs-backdrop'] = 'static';
     } elseif ($backdrop === false) {
@@ -34,16 +38,25 @@
         aria-labelledby="{{ $labelId }}"
         {{ $attributes->merge($dataAttrs)->class($classes) }}
 >
-    {{-- Header --}}
-    <div class="offcanvas-header">
+    {{--
+       HEADER
+       Logik: Wenn responsive='lg' gesetzt ist, fügen wir 'd-lg-none' hinzu.
+       Dadurch verschwindet der Close-Button auf dem Desktop (wo er eh nicht geht).
+    --}}
+    <div class="offcanvas-header border-bottom {{ $responsive ? 'd-'.$responsive.'-none' : '' }}">
         <h5 class="offcanvas-title" id="{{ $labelId }}">
             {{ $title ?? $header ?? '' }}
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
+        {{-- FIX: Wir geben explizit das Target mit an --}}
+        <x-bs::button.close
+            dismiss="offcanvas"
+            target="#{{ $id }}"
+        />
     </div>
 
     {{-- Body --}}
-    <div class="offcanvas-body">
+    <div class="offcanvas-body d-flex flex-column h-100 p-0 custom-scrollbar">
         {{ $slot }}
     </div>
 </div>

@@ -9,7 +9,11 @@
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
     $id = $attributes->get('id') ?? 'btn-' . uniqid();
-    $classes = 'btn btn-' . $variant;
+    $classes = 'btn';
+    if($variant){
+        $classes .= ' btn-' . $variant;
+    }
+
     if($size) $classes .= ' btn-' . $size;
 
     // Falls Attribut vorhanden, entsprechend nehmen

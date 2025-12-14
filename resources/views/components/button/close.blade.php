@@ -1,5 +1,6 @@
 @props([
     'dismiss' => null,  // Pflichtfeld für Service-Steuerung
+    'target' => null,
     'variant' => null,
     'outline' => false,
 ])
@@ -7,6 +8,7 @@
 @php
     use Illuminate\Support\Str;
     if($dismiss) $attributes['data-bs-dismiss'] = $dismiss;
+    if($target) $attributes['data-bs-target'] = $target;
     $variantClass = '';
     if($variant){
         $actualVariant = $outline && !str_contains($variant, 'outline') ? 'outline-' . $variant : $variant;
@@ -21,6 +23,10 @@
 
 @endphp
 
-<button type="button" {{ $attributes->class($classes) }} aria-label="Close" {{ $attributes }}>
+<button
+    type="button"
+    {{ $attributes->class($classes) }}
+    aria-label="Close"
+    {{ $attributes }}>
     {{ $slot }}
 </button>
