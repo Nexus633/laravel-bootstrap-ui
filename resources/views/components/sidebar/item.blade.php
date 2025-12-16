@@ -1,5 +1,6 @@
 @props([
     'href' => '#',
+    'activeVariant' => 'body-secondary',
     'name' => null,
     'icon' => null,
     'badge' => null,
@@ -10,7 +11,9 @@
 @php
     // CustomAttributs
     $badgeVariant = $attributes->get('badge:variant') ?? $badgeVariant;
-    $attributes = $attributes->except(['badge:variant']);
+    $activeVariant = $attributes->get('active:variant') ?? $activeVariant;
+
+    $attributes = $attributes->except(['badge:variant', 'active:variant']);
 
     // 1. URL Normalisieren
     $path = ltrim($href, '/');
@@ -22,15 +25,14 @@
 
     // 3. Styling
     // Wir nutzen eine einfache Logik:
-    // Aktiv = Voller blauer Hintergrund (bg-primary) + Weiße Schrift.
+    // Aktiv = wird vom prop activeVariant oder dem Attribut active:variant bestimmt. Standard: body-secondary
     // Inaktiv = Transparenter Hintergrund + Graue Schrift.
 
     $commonClasses = "nav-link d-flex align-items-center gap-3 py-2 px-3 rounded-3 transition-base";
 
     if ($isActive) {
         // === AKTIV ===
-        // Sattes Blau, Weiße Schrift. Nicht zu übersehen.
-        $classes = $commonClasses . ' bg-primary text-white shadow-sm fw-medium';
+        $classes = $commonClasses . ' bg-'. $activeVariant .' text-white shadow-sm fw-medium';
         $iconClass = 'text-white'; // Icon muss auch weiß sein
     } else {
         // === INAKTIV ===
@@ -56,10 +58,7 @@
         </span>
 
         @if($badge)
-            {{-- Badge passt sich an: Wenn Item aktiv (Blau), dann Badge Weiß. Sonst Grau. --}}
-            <x-bs::badge
-                :variant="$badgeVariant"
-            >
+            <x-bs::badge :variant="$badgeVariant" >
                 {{ $badge }}
             </x-bs::badge>
         @endif

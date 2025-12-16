@@ -20,7 +20,7 @@
         <x-bs::sidebar.nav>
             <x-bs::sidebar.item icon="house" href="/test" exact>Home</x-bs::sidebar.item>
             <x-bs::sidebar.group label="Demo" icon="box" prefix="*">
-                <x-bs::sidebar.item href="/" badge="2" variant:badge="warning" name="Link A" />
+                <x-bs::sidebar.item href="/" badge="2" badge:variant="warning" name="Link A" />
                 <x-bs::sidebar.item href="#">Link B</x-bs::sidebar.item>
             </x-bs::sidebar.group>
         </x-bs::sidebar.nav>

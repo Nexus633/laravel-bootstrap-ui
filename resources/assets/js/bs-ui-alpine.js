@@ -669,6 +669,48 @@ function registerAlpineFunctions() {
             if(input) input.value = '';
         }
     }));
+
+    Alpine.data('nexusTimeline', (config) => ({
+        expanded: false,
+        cutoff: config.cutoff,
+        totalItems: 0,
+
+        init() {
+            this.countItems();
+
+            // MutationObserver: Falls Livewire Elemente nachlädt, zählen wir neu.
+            // Das ist nur für die Zahl im Button ("3 weitere anzeigen") wichtig.
+            // Das Verstecken macht das CSS automatisch.
+            let observer = new MutationObserver(() => {
+                this.countItems();
+                // Optional: Beim Blättern wieder zuklappen
+                this.expanded = false;
+            });
+
+            if (this.$refs.listContainer) {
+                observer.observe(this.$refs.listContainer, { childList: true });
+            }
+        },
+
+        countItems() {
+            if(!this.$refs.listContainer) return;
+            // Zählt nur direkte DIV Kinder
+            this.totalItems = Array.from(this.$refs.listContainer.children)
+                .filter(el => el.tagName === 'DIV').length;
+        },
+
+        get remainingCount() {
+            return Math.max(0, this.totalItems - this.cutoff);
+        },
+
+        get shouldShowExpand() {
+            return !this.expanded && this.totalItems > this.cutoff;
+        },
+
+        get shouldShowCollapse() {
+            return this.expanded && this.totalItems > this.cutoff;
+        }
+    }));
 }
 
 

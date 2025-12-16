@@ -31,5 +31,26 @@ return [
             'to' => 'to',
             'select_time' => 'Select time'
         ]
-    ]
+    ],
+    'file-upload' => [
+        'label' => 'Upload file',
+        'zone' => [
+            'label' => 'File here or click',
+            'accept' => 'Permitted:',
+            'accept_all' => 'All file types'
+        ],
+        'simple' => [
+            'upload' => 'Uploading...'
+        ],
+    ],
+    'pagination' => [
+        'previous' => 'Previous',
+        'first'    => 'First',
+        'next'     => 'Next',
+        'last'     => 'Last',
+        'showing'  => 'Showing',
+        'to'       => 'to',
+        'of'       => 'of',
+        'results'  => 'results',
+    ],
 ];

@@ -9,7 +9,8 @@
     'relative' => false,
     'align' => null,
     'collapse' => null,
-    'offcanvas' => null // NEU: ID des Offcanvas, z.B. 'sidebarCart'
+    'offcanvas' => null, // NEU: ID des Offcanvas, z.B. 'sidebarCart'
+    'pagination' => false
 ])
 
 @php
@@ -56,9 +57,13 @@
         if ($isLink && !$attributes->has('href')) $extraAttrs['href'] = $target;
     }
 
+    if($pagination){
+        $classes = "page-link";
+    }
+
 @endphp
 
-<{{ $tag }} id="{{ $id }}"
+<{{ $tag }} @if($id) id="{{ $id }}" @endif
 @if(!$isLink) type="{{ $type }}" @endif
 {{ $attributes->merge($extraAttrs)->merge(['class' => $classes]) }}
 @if($loading && !$isLink)

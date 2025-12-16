@@ -41,5 +41,15 @@ return [
         'simple' => [
             'upload' => 'Wird hochgeladen...'
         ],
-    ]
+    ],
+    'pagination' => [
+        'previous' => 'Zurück',
+        'first'    => 'Erste',
+        'next'     => 'Weiter',
+        'last'     => 'Letzte',
+        'showing'  => 'Zeige',
+        'to'       => 'bis',
+        'of'       => 'von',
+        'results'  => 'Ergebnissen',
+    ],
 ];
