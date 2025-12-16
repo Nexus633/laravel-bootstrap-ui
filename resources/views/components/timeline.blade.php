@@ -11,7 +11,7 @@
 
 <div
     id="{{ $uuid }}"
-    x-data="nexusTimeline({
+    x-data="bsTimeline({
         cutoff: {{ $cutoff }}
     })"
     class="position-relative ms-3 my-2"
@@ -43,13 +43,13 @@
         <div x-cloak x-show="shouldShowExpand" class="ps-4 mt-2">
             <x-bs::button size="sm" variant="outline-secondary" class="rounded-pill px-3" @click="expanded = true">
                 <x-bs::icon name="chevron-down" class="me-1"/>
-                <span x-text="remainingCount + ' weitere anzeigen'"></span>
+                <span x-text="remainingCount + ' {{ __('bs::bootstrap-ui.timeline.show_more') }}'"></span>
             </x-bs::button>
         </div>
 
         <div x-cloak x-show="shouldShowCollapse" class="ps-4 mt-2">
             <x-bs::button size="sm" variant="link" class="text-body-secondary text-decoration-none px-0" @click="expanded = false">
-                Weniger anzeigen
+                {{ __('bs::bootstrap-ui.timeline.show_less') }}
             </x-bs::button>
         </div>
     @endif

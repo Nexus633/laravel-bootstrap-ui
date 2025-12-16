@@ -670,7 +670,7 @@ function registerAlpineFunctions() {
         }
     }));
 
-    Alpine.data('nexusTimeline', (config) => ({
+    Alpine.data('bsTimeline', (config) => ({
         expanded: false,
         cutoff: config.cutoff,
         totalItems: 0,
@@ -709,6 +709,41 @@ function registerAlpineFunctions() {
 
         get shouldShowCollapse() {
             return this.expanded && this.totalItems > this.cutoff;
+        }
+    }));
+
+    Alpine.data('bsCopyBtn', (config) => ({
+        copied: false,
+        textVal: config.text,
+        targetId: config.target,
+        duration: config.duration,
+
+        copyToClipboard() {
+            let content = this.textVal;
+            if (this.targetId) {
+                const el = document.getElementById(this.targetId);
+                if (el) content = el.value || el.innerText;
+            }
+            if (!content) return;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(content).then(() => this.triggerSuccess())
+                    .catch(e => console.error(e));
+            } else {
+                // Fallback
+                const ta = document.createElement("textarea");
+                ta.value = content;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                ta.remove();
+                this.triggerSuccess();
+            }
+        },
+
+        triggerSuccess() {
+            this.copied = true;
+            setTimeout(() => this.copied = false, this.duration);
         }
     }));
 }

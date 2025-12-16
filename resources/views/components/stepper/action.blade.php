@@ -1,5 +1,5 @@
 @props([
-    'finishLabel' => 'Abschließen',
+    'finishLabel' => __('bs::bootstrap-ui.stepper.action.label_finish'),
     'finishLink' => null, // Optionaler Link am Ende
     'iconFinished' => 'check-lg',
     'iconNext' => 'arrow-right',
@@ -26,7 +26,7 @@
                 @click="prev()"
                 wire:key="btn-step-last" {{-- FIX: Livewire ignoriert jetzt ID-Änderungen --}}
             >
-                @if($iconLast) <x-bs::icon :name="$iconLast" class="ms-1"/> @endif Zurück
+                @if($iconLast) <x-bs::icon :name="$iconLast" class="ms-1"/> @endif {{ __('bs::bootstrap-ui.stepper.action.button.previous') ?? 'Zurück' }}
             </x-bs::button>
         </x-bs::row.col>
         <x-bs::row.col size="4" class="text-center">
@@ -41,7 +41,7 @@
                 @click="next()"
                 wire:key="btn-step-next" {{-- FIX: Livewire ignoriert jetzt ID-Änderungen --}}
             >
-                Weiter @if($iconNext) <x-bs::icon :name="$iconNext" class="ms-1"/> @endif
+                {{ __('bs::bootstrap-ui.stepper.action.button.next') ?? 'Weiter' }} @if($iconNext) <x-bs::icon :name="$iconNext" class="ms-1"/> @endif
             </x-bs::button>
 
             {{-- Button: Fertig --}}

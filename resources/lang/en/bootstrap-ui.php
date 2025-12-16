@@ -53,4 +53,17 @@ return [
         'of'       => 'of',
         'results'  => 'results',
     ],
+    'stepper' => [
+        'action' => [
+            'label_finish' => 'Finished',
+            'button' => [
+                'next' => 'Next',
+                'previous' => 'Previous'
+            ]
+        ]
+    ],
+    'timeline' => [
+        'show_more' => 'show more',
+        'show_less' => 'Show less'
+    ]
 ];

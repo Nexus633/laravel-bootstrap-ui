@@ -52,4 +52,17 @@ return [
         'of'       => 'von',
         'results'  => 'Ergebnissen',
     ],
+    'stepper' => [
+        'action' => [
+            'label_finish' => 'Abschließen',
+            'button' => [
+                'next' => 'Weiter',
+                'previous' => 'Zurück'
+            ]
+        ]
+    ],
+    'timeline' => [
+        'show_more' => 'weitere anzeigen',
+        'show_less' => 'Weniger anzeigen'
+    ]
 ];
