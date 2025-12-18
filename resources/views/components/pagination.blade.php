@@ -1,8 +1,8 @@
 @php
 
-    $usePaginationIcons = $this->usePaginationIcons ?? config('bs::bootstrap-ui.pagination.use_icons', true);
-    $displayPaginationSummary = $this->displayPaginationSummary ?? config('bs::bootstrap-ui.pagination.show_summary', true);
-    $displayFirstAndLastPage = $this->displayFirstAndLastPage ?? config('bs::bootstrap-ui.pagination.show_first_and_last_page', false);
+    $usePaginationIcons = $this->usePaginationIcons ?? config('bootstrap-ui.pagination.use_icons', true);
+    $displayPaginationSummary = $this->displayPaginationSummary ?? config('bootstrap-ui.pagination.show_summary', true);
+    $displayFirstAndLastPage = $this->displayFirstAndLastPage ?? config('bootstrap-ui.pagination.show_first_and_last_page', false);
 @endphp
 
 @if ($paginator->hasPages())

@@ -7,7 +7,7 @@
     <title>{{ $title ?? config('app.name') }}</title>
 
     {{-- Deine Head Komponente (Bootstrap CSS, Meta Tags etc.) --}}
-    <x-bs::head />
+    <x-bs::head editor/>
 
     @livewireStyles
 </head>
@@ -65,7 +65,7 @@
 
     </x-bs::body.main>
 
-    <x-bs::scripts charts="true" />
+    <x-bs::scripts charts editor/>
     @livewireScripts
 </x-bs::body>
 </html>

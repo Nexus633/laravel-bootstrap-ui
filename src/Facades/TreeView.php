@@ -5,13 +5,12 @@ namespace Nexus633\BootstrapUi\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static string|null normalize(?string $iconName)
- * @method static string toClass(?string $iconName)
+ * @method static string getIcon(string $name, bool $isFolder = false, bool $isOpen = false)
  */
-class Icon extends Facade
+class TreeView extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return 'bs-icon';
+        return 'bs-tree-view';
     }
 }

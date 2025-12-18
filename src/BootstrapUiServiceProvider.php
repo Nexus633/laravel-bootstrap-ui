@@ -9,6 +9,7 @@ use Nexus633\BootstrapUi\Services\IconService;
 use Nexus633\BootstrapUi\Services\ModalService;
 use Nexus633\BootstrapUi\Services\ThemeService;
 use Nexus633\BootstrapUi\Services\ToastService;
+use Nexus633\BootstrapUi\Services\TreeViewService;
 
 class BootstrapUiServiceProvider extends ServiceProvider
 {
@@ -52,12 +53,16 @@ class BootstrapUiServiceProvider extends ServiceProvider
             return new ToastService();
         });
 
-        $this->app->singleton('bs-icon-service', function () {
+        $this->app->singleton('bs-icon', function () {
             return new IconService();
         });
 
         $this->app->singleton('bs-modal', function () {
             return new ModalService();
+        });
+
+        $this->app->singleton('bs-tree-view', function () {
+            return new TreeViewService();
         });
     }
 

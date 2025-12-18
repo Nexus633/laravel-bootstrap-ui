@@ -65,5 +65,8 @@ return [
     'timeline' => [
         'show_more' => 'show more',
         'show_less' => 'Show less'
+    ],
+    'tree-view' => [
+        'unknown_file_name' => 'unknown'
     ]
 ];

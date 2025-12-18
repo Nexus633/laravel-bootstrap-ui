@@ -9,10 +9,10 @@
 
 <li class="nav-item my-1">
     <button
-            class="nav-link d-flex align-items-center gap-3 w-100 text-start text-body-secondary hover-bg-body-secondary px-3 py-2 rounded-3 {{ $isOpen ? '' : 'collapsed' }}"
-            data-bs-toggle="collapse"
-            data-bs-target="#{{ $id }}"
-            aria-expanded="{{ $isOpen ? 'true' : 'false' }}"
+        class="nav-link d-flex align-items-center gap-3 w-100 text-start text-body-secondary hover-bg-body-secondary px-3 py-2 rounded-3 {{ $isOpen ? '' : 'collapsed' }}"
+        data-bs-toggle="collapse"
+        data-bs-target="#{{ $id }}"
+        aria-expanded="{{ $isOpen ? 'true' : 'false' }}"
     >
         @if($icon)
             <x-bs::icon :name="$icon" size="1.1rem" class="text-muted" />

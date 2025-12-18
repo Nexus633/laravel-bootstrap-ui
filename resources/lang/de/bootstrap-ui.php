@@ -17,7 +17,8 @@ return [
             'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'
         ],
         'inputs' => [
-            'from_to' => 'Von - Bis',
+            'from' => 'von',
+            'to' => 'bis',
             'select_date' => 'Datum wählen'
         ]
     ],
@@ -64,5 +65,8 @@ return [
     'timeline' => [
         'show_more' => 'weitere anzeigen',
         'show_less' => 'Weniger anzeigen'
+    ],
+    'tree-view' => [
+        'unknown_file_name' => 'Unbenannt'
     ]
 ];

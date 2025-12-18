@@ -746,6 +746,79 @@ function registerAlpineFunctions() {
             setTimeout(() => this.copied = false, this.duration);
         }
     }));
+
+    Alpine.data('bsEditor', (model) => ({
+        content: model,
+        config: {},
+        editor: null,
+        isFocused: false,
+
+        init() {
+            // 1. Config lesen
+            if (this.$el.dataset.config) {
+                this.config = JSON.parse(this.$el.dataset.config);
+            }
+
+            const finalModules = this.config.modules || {};
+
+            // 2. Quill Starten
+            this.editor = new Quill(this.$refs.quillEditor, {
+                theme: this.config.theme || 'snow',
+                placeholder: this.config.placeholder,
+                modules: finalModules
+            });
+
+            if (this.config.height) this.$refs.quillEditor.style.height = this.config.height;
+            if (this.content) this.editor.root.innerHTML = this.content;
+
+            // --- FLÜSSIGKEITS-LOGIK ---
+
+            // A) Fokus Tracking: Verhindert, dass Livewire Updates überschreibt, während du tippst
+            this.editor.on('selection-change', (range) => {
+                this.isFocused = !!range;
+            });
+
+            // B) Update Funktion mit Debounce Unterstützung
+            const updateContent = () => {
+                let html = this.editor.root.innerHTML;
+                if (html === '<p><br></p>') html = null;
+                this.content = html; // Schreibt in Entangle -> Sendet an Server
+            };
+
+            // C) Debounce anwenden (falls in Blade konfiguriert)
+            // Wenn du wire:model.live.debounce.500ms nutzt, ist this.config.debounce = 500
+            let changeHandler = updateContent;
+
+            if (this.config.debounce > 0) {
+                changeHandler = this.debounce(updateContent, this.config.debounce);
+            }
+
+            // Event Listener
+            this.editor.on('text-change', changeHandler);
+
+            // --- EXTERNE UPDATES ---
+
+            this.$watch('content', (newContent) => {
+                // WICHTIG: Wenn wir den Fokus haben, ignorieren wir eingehende Daten.
+                // Das verhindert das "Echo-Ruckeln".
+                if (this.isFocused) return;
+
+                if (this.editor.root.innerHTML !== newContent) {
+                    this.editor.root.innerHTML = newContent ?? '';
+                }
+            });
+        },
+
+        // Helper Funktion für Verzögerung
+        debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+    }));
 }
 
 

@@ -258,3 +258,91 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     background-color: var(--bs-secondary-bg);
     color: var(--bs-body-emphasis) !important;
 }
+
+/* Nur anwenden, wenn Bootstrap Dark Mode aktiv ist */
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-toolbar {
+    background-color: var(--bs-tertiary-bg);
+    border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-container {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+/* Toolbar Icons einfärben (Stroke & Fill anpassen) */
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-stroke {
+    stroke: var(--bs-body-color) !important;
+}
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-fill {
+    fill: var(--bs-body-color) !important;
+}
+
+/* Aktive Buttons (z.B. wenn "Fett" aktiv ist) -> Primary Color */
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-active .ql-stroke {
+    stroke: var(--bs-primary) !important;
+}
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-active .ql-fill {
+    fill: var(--bs-primary) !important;
+}
+
+/* Picker (Dropdowns für Headlines etc) Textfarbe */
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-picker {
+    color: var(--bs-body-color);
+}
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-picker-label::before {
+    color: var(--bs-body-color);
+}
+
+/* Placeholder Text (grau statt schwarz) */
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-editor.ql-blank::before {
+    color: var(--bs-secondary-color);
+    font-style: normal;
+}
+
+/* Dropdown Menü Hintergrund */
+[data-bs-theme="dark"] .bs-quill-wrapper .ql-picker-options {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+/* Tree View */
+/* Tree View Styling */
+.tree-view-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+/* Einrückung & Linien für Unterelemente */
+.tree-view-sublist {
+    list-style: none;
+    padding-left: 1.25rem; /* Einrückung */
+    margin-left: 0.6rem;   /* Abstand für die Linie */
+    border-left: 1px solid var(--bs-border-color); /* Die vertikale Linie */
+}
+
+/* Item Zeile */
+.tree-view-item-row {
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--bs-border-radius);
+    transition: background-color 0.15s ease-in-out;
+    cursor: default;
+}
+
+/* Hover & Active States */
+.tree-view-item-row:hover {
+    background-color: var(--bs-secondary-bg);
+}
+
+.tree-view-item-row.active {
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary-text-emphasis);
+}
+
+/* Cursor Pointer nur wenn klickbar (Ordner oder Link) */
+.cursor-pointer {
+    cursor: pointer;
+}
