@@ -25,6 +25,10 @@
     // Berechne die CSS-Klassennamen für die beiden Zustände
     $baseClass = $outline ? 'btn-outline-'.$variant : 'btn-'.$variant;
     $doneClass = $outline ? 'btn-outline-'.$successVariant : 'btn-'.$successVariant;
+
+    if ($target && str_starts_with($target, '#')) {
+        $target = substr($target, 1);
+    }
 @endphp
 
 {{-- Globaler Style Fix für x-cloak --}}

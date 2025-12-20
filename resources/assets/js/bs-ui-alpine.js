@@ -819,6 +819,83 @@ function registerAlpineFunctions() {
             };
         }
     }));
+
+    Alpine.data('bsContextMenu', (targetId) => ({
+        isOpen: false,
+        isVisible: false,
+        position: { x: 0, y: 0 },
+
+        // NEU: Style als Computed Property
+        // Das löst den ReferenceError, da wir hier sicher auf 'this' zugreifen können
+        get style() {
+            return `
+                    position: fixed; 
+                    top: ${this.position.y}px; 
+                    left: ${this.position.x}px; 
+                    z-index: 9999;
+                    visibility: ${this.isVisible ? 'visible' : 'hidden'};
+                `;
+        },
+
+        init() {
+            this.$nextTick(() => {
+                const element = document.getElementById(targetId);
+                if (element) {
+                    element.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        this.open(e);
+                    });
+                    window.addEventListener('contextmenu', (e) => {
+                        if (!element.contains(e.target)) this.close();
+                    });
+                }
+            });
+
+            window.addEventListener('bs-context-menu-opened', (event) => {
+                if (event.detail !== targetId) this.close();
+            });
+        },
+
+        open(event) {
+            window.dispatchEvent(new CustomEvent('bs-context-menu-opened', { detail: targetId }));
+
+            this.position.x = event.clientX;
+            this.position.y = event.clientY;
+
+            // Unsichtbar starten
+            this.isVisible = false;
+            this.isOpen = true;
+
+            this.$nextTick(() => {
+                // Im nächsten Frame: Messen & Korrigieren
+                const el = this.$refs.menuPanel;
+                if (!el) return;
+
+                const height = el.offsetHeight;
+                const width = el.offsetWidth;
+                const winHeight = window.innerHeight;
+                const winWidth = window.innerWidth;
+
+                // Y-Achse (Unten)
+                if ((this.position.y + height) > winHeight) {
+                    this.position.y -= height;
+                }
+
+                // X-Achse (Rechts)
+                if ((this.position.x + width) > winWidth) {
+                    this.position.x -= width;
+                }
+
+                // Sichtbar schalten
+                this.isVisible = true;
+            });
+        },
+
+        close() {
+            this.isOpen = false;
+            this.isVisible = false;
+        }
+    }));
 }
 
 
@@ -827,7 +904,7 @@ function registerAlpineDirective() {
 
         // Den Text/Titel aus dem Alpine-Ausdruck holen
         let title = evaluate(expression);
-
+        console.log(title)
         // Falls kein Text da ist, abbrechen
         if (!title) return;
 

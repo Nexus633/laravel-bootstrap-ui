@@ -1,5 +1,8 @@
 <?php
 return [
+    'button' => [
+        'InvalidArgumentException' => 'Button cannot use collapse and offcanvas simultaneously'
+    ],
     'input' => [
         'tags' => [
             'limit_reached' => 'Limit reached (:max)'
@@ -68,5 +71,10 @@ return [
     ],
     'tree-view' => [
         'unknown_file_name' => 'unknown'
+    ],
+    'kvb' => [
+        'tooltip' => [
+            'copy' => 'Copy'
+        ]
     ]
 ];

@@ -346,3 +346,56 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .cursor-pointer {
     cursor: pointer;
 }
+
+/* Basis Container */
+.bs-divider {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    color: var(--bs-body-color); /* Standardfarbe fallback */
+
+    /* Hier greift die dynamische Breite aus der Komponente */
+    width: var(--bs-divider-width, 100%);
+}
+
+/* Die eigentliche Linie */
+.bs-divider-line {
+    flex-grow: 1;
+    border-top: 1px solid currentColor;
+    opacity: 0.25; /* Standard Bootstrap HR Opacity */
+}
+
+/* Der Text/Icon Bereich */
+.bs-divider-content {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 0.875em; /* small */
+    text-transform: uppercase;
+    font-weight: 600; /* fw-semibold */
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Vertikaler Divider */
+.bs-divider-vertical {
+    display: inline-block;
+    align-self: center;
+    width: 1px;
+    min-height: 20px;
+    height: 1em;
+    background-color: currentColor;
+    opacity: 0.25;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.code-bg {
+    background-color: var(--bs-tertiary-bg);
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-family: var(--bs-font-monospace);
+    color: var(--bs-danger);
+}

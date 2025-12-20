@@ -27,6 +27,7 @@
     type="button"
     {{ $attributes->class($classes) }}
     aria-label="Close"
+    @if($dismiss === 'modal') @click="$el.blur()" @endif
     {{ $attributes }}>
     {{ $slot }}
 </button>
