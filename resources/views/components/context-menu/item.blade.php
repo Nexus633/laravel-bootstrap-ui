@@ -12,55 +12,36 @@
 
 @php
     use Illuminate\View\ViewException;
-    if(!$divider){
-        if(!$label){
-            throw new ViewException('Das Attribut "label" fehlt für das Context-Menu Item.');
-        }
+
+    if(!$divider && !$label){
+        throw new ViewException(__('bs::bootstrap-ui.context-menu.ViewException'));
     }
 
-    $textColorClass = '';
-    if($danger){
-        $textColorClass = 'text-danger';
-    }
+    $jsConfig = [
+        'confirm'     => $confirm,
+        'confirmText' => $confirmText,
+        'action'      => $action,
+        'dispatch'    => $dispatch,
+        'params'      => $params
+    ];
 @endphp
 
 @if($divider)
-    <div class="dropdown-divider"></div>
+    <x-bs::divider />
 @else
-    <a href="#"
-       class="dropdown-item cursor-pointer"
-       @click.prevent="
-            close(); {{-- Menü schließen --}}
-
-            {{-- Fall 1: Modal Bestätigung --}}
-            @if($dispatch)
-                @if($params)
-                    $wire.dispatch('{{ $dispatch }}', @js($params));
-                @else
-                    $wire.dispatch('{{ $dispatch }}');
-                @endif
-                return;
-            @endif
-
-            {{-- Fall 2: Browser Alert Bestätigung --}}
-            @if($confirm)
-                if(!confirm('{{ $confirmText }}')) return;
-            @endif
-
-
-
-            {{-- Fall 3: Sofortige Ausführung (wenn kein Modal) --}}
-            @if($action)
-                {{-- Spread Operator (...) nutzen, um Parameter sauber an die Funktion zu übergeben --}}
-                $wire.{{ $action }}(@js($params))
-            @endif
-       "
+    <x-bs::link
+        href="#"
+        class="dropdown-item d-flex align-items-center cursor-pointer w-100 text-start"
+        x-data="bsContextMenuItem({{ json_encode($jsConfig) }})"
+        @click.prevent="execute()"
+        :no-underline="true"
+        :variant="null"
     >
         @if($icon)
-            <x-bs::icon name="{{ $icon }}" :variant="$danger ? 'danger' : ''" class="me-2"/>
+            <x-bs::icon name="{{ $icon }}" :variant="$danger ? 'danger' : null" class="me-2"/>
         @endif
-        <span class="{{ $textColorClass }}">
+        <x-bs::text span :variant="$danger ? 'danger' : null">
             {{ $label }}
-        </span>
-    </a>
+        </x-bs::text>
+    </x-bs::link>
 @endif

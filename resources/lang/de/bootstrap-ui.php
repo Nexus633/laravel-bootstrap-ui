@@ -20,6 +20,7 @@ return [
             'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'
         ],
         'inputs' => [
+            'from_to' => 'von - bis',
             'from' => 'von',
             'to' => 'bis',
             'select_date' => 'Datum wählen'
@@ -73,6 +74,7 @@ return [
         'unknown_file_name' => 'Unbenannt'
     ],
     'context-menu' => [
+        'ViewException' => 'Das Attribut "label" fehlt für das Context-Menu Item.',
         'confirm' => 'Bist du sicher?'
     ],
     'kvb' => [

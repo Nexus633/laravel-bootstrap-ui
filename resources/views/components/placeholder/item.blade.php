@@ -1,35 +1,24 @@
 @props([
-    'cols' => null,      // Breite als Grid-Spalten (1-12)
-    'width' => null,     // Breite manuell (z.B. '75%')
+    'cols' => null,      // 1-12
+    'width' => null,     // z.B. '75%'
     'size' => null,      // xs, sm, lg
-    'variant' => null,   // primary, secondary, light, dark...
-    'button' => false,   // Sieht aus wie ein Button
+    'variant' => null,   // primary, secondary...
+    'button' => false,   // Button-Look
 ])
 
 @php
-    $classes = ['placeholder'];
-
-    // Größenlogik
-    if ($cols) {
-        $classes[] = 'col-' . $cols;
-    }
-
-    // Style Variationen
-    if ($size) $classes[] = 'placeholder-' . $size;
-    if ($variant) $classes[] = 'bg-' . $variant;
-
-    // Button-Modus
-    if ($button) {
-        $classes[] = 'btn disabled';
-    }
+    // Tag bestimmen: 'a' für Buttons (damit disabled styling greift), sonst 'span'
+    $tag = $button ? 'a' : 'span';
 @endphp
 
-{{--
-    Wenn 'button' aktiv ist, nutzen wir 'a', sonst 'span'.
-    Das ist Bootstrap Standard für Placeholder-Buttons.
---}}
-<{{ $button ? 'a' : 'span' }}
-    {{ $attributes->class($classes) }}
+<{{ $tag }}
+    {{ $attributes->class([
+        'placeholder',
+        'col-' . $cols => $cols,                  // Nur wenn $cols gesetzt ist
+        'placeholder-' . $size => $size,          // Nur wenn $size gesetzt ist
+        'bg-' . $variant => $variant,             // Nur wenn $variant gesetzt ist
+        'btn disabled' => $button,                // Nur wenn button=true
+    ]) }}
     @if($width) style="width: {{ $width }};" @endif
 @if($button) href="#" tabindex="-1" @endif
-></{{ $button ? 'a' : 'span' }}>
+></{{ $tag }}>

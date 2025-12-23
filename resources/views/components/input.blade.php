@@ -61,7 +61,7 @@
                 {{-- Prepend --}}
                 @if($prepend || $iconPrepend)
                     <x-bs::input-group.text>
-                         @if($iconPrepend) <i class="{{ $iconPrepend }}"></i> @else {!! $prepend !!} @endif
+                         @if($iconPrepend) <x-bs::icon :name="$iconPrepend" /> @else {!! $prepend !!} @endif
                     </x-bs::input-group.text>
                 @endif
 
@@ -69,7 +69,7 @@
                 @if($isFloating)
                     <div class="form-floating {{ $hasError ? 'is-invalid' : '' }}">
                         <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" placeholder="{{ $label }}" {{ $attributes->class($inputClasses) }} />
-                        <label for="{{ $id }}">{{ $label }}</label>
+                        <x-bs::text label for="{{ $id }}">{{ $label }}</x-bs::text>
                     </div>
                 @else
                     <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" {{ $attributes->class($inputClasses) }} />
@@ -78,7 +78,7 @@
                 {{-- Append --}}
                 @if($append || $iconAppend)
                     <x-bs::input-group.text>
-                        @if($iconAppend) <i class="{{ $iconAppend }}"></i> @else {!! $append !!} @endif
+                        @if($iconAppend) <x-bs::icon :name="$iconAppend" /> @else {!! $append !!} @endif
                     </x-bs::input-group.text>
                 @endif
             </x-bs::input.group>
@@ -87,7 +87,7 @@
             {{-- OPTION B: PURE FLOATING --}}
             <div class="form-floating {{ $hasError ? 'is-invalid' : '' }}">
                 <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" placeholder="{{ $label }}" {{ $attributes->class($inputClasses) }} />
-                <label for="{{ $id }}">{{ $label }}</label>
+                <x-bs::text label for="{{ $id }}">{{ $label }}</x-bs::text>
             </div>
 
         @else

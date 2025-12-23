@@ -30,6 +30,7 @@ return [
             'no_time_available' => 'No times available',
         ],
         'inputs' => [
+            'from_to' => 'from - to',
             'from' => 'from',
             'to' => 'to',
             'select_time' => 'Select time'
@@ -71,6 +72,10 @@ return [
     ],
     'tree-view' => [
         'unknown_file_name' => 'unknown'
+    ],
+    'context-menu' => [
+        'ViewException' => 'The "label" attribute is missing for the Context menu Item.',
+        'confirm' => 'Are you sure?'
     ],
     'kvb' => [
         'tooltip' => [

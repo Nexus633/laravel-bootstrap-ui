@@ -497,4 +497,90 @@ return [
             'file-earmark-code'   => ['php', 'js', 'css', 'html', 'json', 'xml', 'sql', 'yaml', 'yml', 'vue', 'blade.php'],
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Shortcut Configuration
+    |--------------------------------------------------------------------------
+    |
+    */
+    'shortcuts' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Shortcut Security
+        |--------------------------------------------------------------------------
+        |
+        | Hier werden die Sicherheitsmechanismen für die Shortcut-Komponente
+        | konfiguriert. Da Shortcuts JS-Code ausführen können, verhindern wir
+        | hier Injection-Angriffe und unsicheren Code.
+        |
+        */
+        'security' => [
+            /*
+            |--------------------------------------------------------------------------
+            | Enabled
+            |--------------------------------------------------------------------------
+            |
+            | Schaltet den Sicherheits-Check global an oder aus.
+            | Wenn false, wird jeder Code ungeprüft ausgeführt (Nicht empfohlen).
+            |
+            */
+            'enabled' => true,
+
+            /*
+            |--------------------------------------------------------------------------
+            | Exception Handling
+            |--------------------------------------------------------------------------
+            |
+            | Bestimmt, wie mit Sicherheitsverstößen umgegangen wird.
+            | true  = Wirft eine PHP Exception (App Crash). Ideal für 'local'.
+            | false = Loggt nur eine Warnung und blockiert den Code. Ideal für 'production'.
+            |
+            */
+            'throw_exception' => env('APP_DEBUG', false),
+
+            /*
+            |--------------------------------------------------------------------------
+            | Blacklist
+            |--------------------------------------------------------------------------
+            |
+            | Eine Liste von Schlüsselwörtern oder Mustern, die im JS-Code der
+            | Shortcuts verboten sind. Groß-/Kleinschreibung wird ignoriert.
+            |
+            */
+            'blacklist' => [
+                // Gruppe 1: Code Ausführung & Manipulation
+                'eval',
+                'exec',
+                'Function',       // new Function(...)
+                'setTimeout',     // Oft für Hacks genutzt
+                'setInterval',
+
+                // Gruppe 2: Netzwerk & Exfiltration
+                'XMLHttpRequest',
+                'fetch',
+                'navigator.sendBeacon',
+
+                // Gruppe 3: Speicher & Cookies (Stealing)
+                'document.cookie',
+                'localStorage',
+                'sessionStorage',
+                'indexedDB',
+
+                // Gruppe 4: Navigation & Redirects
+                'window.location',
+                'history.pushState',
+
+                // Gruppe 5: HTML Injection
+                '<script',
+                'innerHTML',
+                'outerHTML',
+
+                // Gruppe 6: System (PHP exec via JS hacks etc.)
+                'system',
+                'passthru',
+                'shell_exec',
+            ],
+        ],
+    ]
 ];

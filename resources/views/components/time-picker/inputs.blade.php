@@ -35,8 +35,8 @@
                 @click="toggle()"
                 readonly
                 style="cursor: pointer;"
-                class="bg-transparent"
                 autocomplete="off"
+                {{ $attributes }}
             />
         </x-bs::row.col>
         <x-bs::row.col size="6">
@@ -54,8 +54,8 @@
                 @click="toggle()"
                 readonly
                 style="cursor: pointer;"
-                class="bg-transparent"
                 autocomplete="off"
+                {{ $attributes }}
             />
         </x-bs::row.col>
     </x-bs::row>
@@ -77,8 +77,9 @@
             readonly
             simple
             style="cursor: pointer;"
-            class="bg-transparent text-center"
+            class="text-center"
             autocomplete="off"
+            {{ $attributes }}
         />
 
         {{-- Separator --}}
@@ -95,8 +96,9 @@
             readonly
             simple
             style="cursor: pointer;"
-            class="bg-transparent text-center"
+            class="text-center"
             autocomplete="off"
+            {{ $attributes }}
         />
 
         @if($iconAppend)
@@ -118,7 +120,7 @@
         @click="toggle()"
         readonly
         style="cursor: pointer;"
-        class="bg-transparent"
         autocomplete="off"
+        {{ $attributes }}
     />
 @endif

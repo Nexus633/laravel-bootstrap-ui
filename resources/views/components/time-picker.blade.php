@@ -74,6 +74,7 @@
             :iconAppendStart="$iconAppendStart"
             :iconPrependEnd="$iconPrependEnd"
             :iconAppendEnd="$iconAppendEnd"
+            {{ $attributes }}
         />
 
         {{-- 2. Hidden Input (Form Support) --}}

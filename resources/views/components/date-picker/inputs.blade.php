@@ -6,6 +6,8 @@
     'separate' => false,
     'labelStart' => null,
     'labelEnd' => null,
+    'transparent' => false,
+
 
     // Icons empfangen
     'iconPrepend' => null,
@@ -29,7 +31,7 @@
                 :id="$id . '-start'"
                 :name="$name . '_start_display'"
                 :label="$labelStart ?? 'Start'"
-                :placeholder="$placeholder ?? __('bs::bootstrap-ui.date-picker.inputs.from')"
+                :placeholder="__('bs::bootstrap-ui.date-picker.inputs.from')"
 
                 {{-- Icons --}}
                 :icon:prepend="$iconPrependStart"
@@ -39,8 +41,8 @@
                 @click="toggle()"
                 readonly
                 style="cursor: pointer;"
-                class="bg-transparent"
                 autocomplete="off"
+                {{ $attributes }}
             />
         </x-bs::row.col>
         <x-bs::row.col size="6">
@@ -48,7 +50,7 @@
                 :id="$id . '-end'"
                 :name="$name . '_end_display'"
                 :label="$labelEnd ?? 'Ende'"
-                :placeholder="$placeholder ?? __('bs::bootstrap-ui.date-picker.inputs.to')"
+                :placeholder="__('bs::bootstrap-ui.date-picker.inputs.to')"
 
                 {{-- Icons --}}
                 :icon:prepend="$iconPrependEnd"
@@ -58,8 +60,8 @@
                 @click="toggle()"
                 readonly
                 style="cursor: pointer;"
-                class="bg-transparent"
                 autocomplete="off"
+                {{ $attributes }}
             />
         </x-bs::row.col>
     </x-bs::row>
@@ -81,7 +83,7 @@
         @click="toggle()"
         readonly
         style="cursor: pointer;"
-        class="bg-transparent"
         autocomplete="off"
+        {{ $attributes }}
     />
 @endif

@@ -118,6 +118,6 @@
 
 @endphp
 
-<{{ $tag }} {{ $attributes->class($classes) }}>
+<{{ $tag }} {{ $attributes->merge($classes ? ['class' => implode(' ', $classes)] : []) }}>
 {{ $slot }}
 </{{ $tag }}>

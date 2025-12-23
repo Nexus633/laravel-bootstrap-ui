@@ -829,12 +829,12 @@ function registerAlpineFunctions() {
         // Das löst den ReferenceError, da wir hier sicher auf 'this' zugreifen können
         get style() {
             return `
-                    position: fixed; 
-                    top: ${this.position.y}px; 
-                    left: ${this.position.x}px; 
-                    z-index: 9999;
-                    visibility: ${this.isVisible ? 'visible' : 'hidden'};
-                `;
+                position: fixed; 
+                top: ${this.position.y}px; 
+                left: ${this.position.x}px; 
+                z-index: 9999;
+                visibility: ${this.isVisible ? 'visible' : 'hidden'};
+            `;
         },
 
         init() {
@@ -896,6 +896,164 @@ function registerAlpineFunctions() {
             this.isVisible = false;
         }
     }));
+
+    Alpine.data('bsContextMenuItem', (config) => ({
+        // Config enthält: confirm, confirmText, action, dispatch, params
+        config: config,
+
+        execute() {
+            // 1. Menü schließen
+            // Wir gehen davon aus, dass im Eltern-Element (dem Dropdown) eine close() Funktion existiert.
+            // Alpine sucht automatisch im Scope nach oben.
+            if (typeof this.close === 'function') {
+                this.close();
+            }
+
+            // 2. Bestätigung (Confirm)
+            if (this.config.confirm) {
+                if (!confirm(this.config.confirmText)) {
+                    return; // Abbrechen
+                }
+            }
+
+            // 3. Livewire Action ausführen
+            // In Livewire 3 ist 'this.$wire' automatisch verfügbar
+            if (!this.$wire) {
+                console.error('bsContextMenuItem: No Livewire context found!');
+                return;
+            }
+
+            if (this.config.dispatch) {
+                // Fall A: Event dispatchen
+                this.$wire.dispatch(this.config.dispatch, this.config.params);
+
+            } else if (this.config.action) {
+                // Fall B: Methode aufrufen
+                const args = Array.isArray(this.config.params) ? this.config.params : [this.config.params];
+                this.$wire[this.config.action](args);
+            }
+        }
+    }));
+
+    Alpine.data('bsShortcut', (config) => ({
+        key: config.key,
+        prevent: config.prevent ?? true,
+        stop: config.stop ?? false,
+        handler: config.handler,
+
+        init() {
+            // Warten bis DOM bereit
+            this.$nextTick(() => {
+                if (this.key) {
+                    // MODUS A: Expliziter Key -> String parsen
+                    this.registerKeyString(this.key);
+                } else {
+                    // MODUS B: Magic Slot -> DOM scannen
+                    this.registerFromSlot();
+                }
+            });
+        },
+
+        registerKeyString(keyString) {
+            const parts = keyString.toLowerCase().replace(/\s/g, '').split('+');
+            this.attachListener(parts);
+        },
+
+        registerFromSlot() {
+            const elements = Array.from(this.$el.querySelectorAll('[data-shortcut-key]'));
+            if (elements.length === 0) return;
+
+            const keys = elements.map(el => el.getAttribute('data-shortcut-key'));
+            this.attachListener(keys);
+        },
+
+        attachListener(keys) {
+            const modifiers = ['ctrl', 'alt', 'shift', 'meta'];
+
+            // Helper: Mapping (esc -> escape)
+            const mapKey = (k) => ({'cmd':'meta','win':'meta','opt':'alt','esc':'escape','del':'delete'}[k] || k);
+
+            // Aufteilen
+            const requiredMods = keys.filter(k => modifiers.includes(k));
+            let mainKey = keys.find(k => !modifiers.includes(k));
+            if (mainKey) mainKey = mapKey(mainKey);
+
+            window.addEventListener('keydown', (e) => {
+                // Modifiers prüfen
+                const check = (mod, eventProp) => requiredMods.some(m => m === mod) === eventProp;
+
+                const ctrl   = check('ctrl', e.ctrlKey);
+                const alt    = check('alt', e.altKey) || check('opt', e.altKey); // opt alias
+                const shift  = check('shift', e.shiftKey);
+                const meta   = check('meta', e.metaKey) || check('cmd', e.metaKey);
+
+                // Key prüfen
+                const keyHit = mainKey ? (e.key.toLowerCase() === mainKey) : true;
+
+                if (ctrl && alt && shift && meta && keyHit) {
+                    if (this.prevent) e.preventDefault();
+                    if (this.stop) e.stopPropagation();
+
+                    // Action ausführen
+                    this.handler();
+                }
+            });
+        }
+    }));
+
+    Alpine.data('bsColorPicker', (initialModel) => ({
+        // textValue ist unser Haupt-Model (entweder Livewire Entangle oder String)
+        textValue: initialModel,
+
+        // pickerValue ist NUR für das <input type="color"> (muss immer #RRGGBB sein)
+        pickerValue: '#000000',
+
+        init() {
+            // Fallback, falls leer
+            if (!this.textValue) this.textValue = '#000000';
+
+            // Initialen Status setzen
+            this.syncPickerFromText();
+
+            // Beobachten, falls sich der Wert von außen ändert (z.B. durch Server)
+            this.$watch('textValue', () => this.syncPickerFromText());
+        },
+
+        // Trigger: User wählt Farbe im bunten Picker
+        updateFromPicker(hex) {
+            this.pickerValue = hex;
+            this.textValue = hex;
+        },
+
+        // Trigger: User tippt Text (oder Preset) -> Wir versuchen es zu verstehen
+        syncPickerFromText() {
+            if (!this.textValue) return;
+
+            // Smart Convert: 'red' -> '#ff0000'
+            const converted = this.nameToHex(this.textValue);
+
+            // Nur updaten, wenn es eine valide Farbe ergab
+            if (converted && converted !== '#000000') {
+                this.pickerValue = converted;
+            } else if (this.isBlack(this.textValue)) {
+                // Sonderfall Schwarz (da nameToHex bei Fehlern oft schwarz/transparent liefert)
+                this.pickerValue = '#000000';
+            }
+        },
+
+        // Hilfsfunktion: Wandelt JEDEN CSS-Farbnamen in Hex um
+        nameToHex(color) {
+            const ctx = document.createElement('canvas').getContext('2d');
+            ctx.fillStyle = color;
+            return ctx.fillStyle; // Browser liefert hier meist Hex zurück
+        },
+
+        // Hilfsfunktion: Prüft explizit auf "Schwarz", da Canvas bei Fehlern auch #000000 sein kann
+        isBlack(val) {
+            const v = val.toLowerCase().trim();
+            return v === 'black' || v === '#000' || v === '#000000' || v === 'rgb(0,0,0)';
+        }
+    }));
 }
 
 
@@ -904,7 +1062,6 @@ function registerAlpineDirective() {
 
         // Den Text/Titel aus dem Alpine-Ausdruck holen
         let title = evaluate(expression);
-        console.log(title)
         // Falls kein Text da ist, abbrechen
         if (!title) return;
 

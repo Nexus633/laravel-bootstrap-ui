@@ -399,3 +399,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     font-family: var(--bs-font-monospace);
     color: var(--bs-danger);
 }
+
+.bs-shortcut {
+    display: none;
+}
