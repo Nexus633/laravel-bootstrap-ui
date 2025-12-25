@@ -66,7 +66,6 @@ class BootstrapColor {
     }
 
     static hexWithAlpha(hex, alpha = 1) {
-        // falls hex wie "#0d6efd" ist → alpha als HEX anhängen
         const a = Math.round(alpha * 255).toString(16).padStart(2, '0');
         return hex + a;
     }
@@ -93,7 +92,6 @@ window.bsChart = function(labels, datasets, options) {
         },
 
         resolveColor(value) {
-            // ... (dein Code bleibt gleich) ...
             if (typeof value === 'string' && value.startsWith('bs:')) {
                 const parts = value.split(':');
                 const color = parts[1];
@@ -107,7 +105,6 @@ window.bsChart = function(labels, datasets, options) {
         },
 
         parseData(originalData) {
-            // ... (dein Code bleibt gleich) ...
             let parsed = JSON.parse(JSON.stringify(originalData));
             parsed.forEach(dataset => {
                 ['backgroundColor', 'borderColor', 'pointBackgroundColor', 'pointBorderColor'].forEach(prop => {
@@ -135,7 +132,7 @@ window.bsChart = function(labels, datasets, options) {
             const ctx = this.$refs.canvas.getContext('2d');
             const type = this.$root.getAttribute('data-type') || 'line';
 
-            // Deine Hilfsfunktion nutzen (ich habe sie hier gekürzt, nutz deine volle Version)
+            // Deine Hilfsfunktion nutzen
             const finalDatasets = this.parseData(this.dataSets);
 
             // Chart erstellen und in die lokale Variable speichern
@@ -157,7 +154,6 @@ window.bsChart = function(labels, datasets, options) {
         },
         destroy() {
             if (_chartInstance) {
-                console.log('Chart cleaning up...'); // Optional zum Testen
                 _chartInstance.destroy();
                 _chartInstance = null;
             }

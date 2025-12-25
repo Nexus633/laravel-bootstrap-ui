@@ -36,37 +36,38 @@
 
 #### 📦 UI Komponenten (Content)
 
-| Komponente                  | Code | Wiki/Doku | Anmerkung |
-|-----------------------------|------|-----------|-----------|
-| **Accordion**               | ✅    | ✅         |           |
-| **Alerts**                  | ✅    | ✅         |           |
-| **Avatar**                  | ✅    | ✅         |           |
-| **Badge**                   | ✅    | ✅         |           |
-| **Button / Group**          | ✅    | ✅         |           |
-| **Card**                    | ✅    | ✅         |           |
-| **Carousel**                | ✅    | ✅         |           |
-| **Charts**                  | ✅    | ✅         |           |
-| **Collapse**                | ✅    | ✅         |           |
-| **Container**               | ✅    | ✅         |           |
-| **Empty State**             | ✅    | ✅         |           |
-| **Figure**                  | ✅    | ✅         |           |
-| **Flash**                   | ✅    | ✅         |           |
-| **Link**                    | ✅    | ✅        |           |
-| **List Group**              | ✅    | ✅         |           |
-| **Metric / Stats**          | ✅    | ✅         |           |
-| **Modal**                   | ✅    | ✅         |           |
-| **Offcanvas**               | ✅    | ✅         |           |j
-| **Placeholders / Skeleton** | ✅    | ✅         |           |
-| **Popovers**                | ✅    | ✅         |           |
-| **Progress**                | ✅    | ✅         |           |
-| **Row**                     | ✅    | ✅         |           |
-| **Scrollspy**               | ✅    | ✅         |           |
-| **Spinners**                | ✅    | ✅         |           |
-| **Text**                    | ✅    | ✅         |           |
-| **Table**                   | ✅    | ✅         |           |
-| **Timeline**                | ✅    | ✅         |           |
-| **Toasts**                  | ✅    | ✅         |           |
-| **Tooltips**                | ✅    | ✅         |           |
+| Komponente                  | Code | Wiki/Doku | Anmerkung                                           |
+|-----------------------------|------|-----------|-----------------------------------------------------|
+| **Accordion**               | ✅    | ✅         |                                                     |
+| **Alerts**                  | ✅    | ✅         |                                                     |
+| **Autocomplete**            | 🚧   | ❌         | Kann sowohl Live als auch Statisch verwendet werden |
+| **Avatar**                  | ✅    | ✅         |                                                     |
+| **Badge**                   | ✅    | ✅         |                                                     |
+| **Button / Group**          | ✅    | ✅         |                                                     |
+| **Card**                    | ✅    | ✅         |                                                     |
+| **Carousel**                | ✅    | ✅         |                                                     |
+| **Charts**                  | ✅    | ✅         |                                                     |
+| **Collapse**                | ✅    | ✅         |                                                     |
+| **Container**               | ✅    | ✅         |                                                     |
+| **Empty State**             | ✅    | ✅         |                                                     |
+| **Figure**                  | ✅    | ✅         |                                                     |
+| **Flash**                   | ✅    | ✅         |                                                     |
+| **Link**                    | ✅    | ✅         |                                                     |
+| **List Group**              | ✅    | ✅         |                                                     |
+| **Metric / Stats**          | ✅    | ✅         |                                                     |
+| **Modal**                   | ✅    | ✅         |                                                     |
+| **Offcanvas**               | ✅    | ✅         |                                                     |j
+| **Placeholders / Skeleton** | ✅    | ✅         |                                                     |
+| **Popovers**                | ✅    | ✅         |                                                     |
+| **Progress**                | ✅    | ✅         |                                                     |
+| **Row**                     | ✅    | ✅         |                                                     |
+| **Scrollspy**               | ✅    | ✅         |                                                     |
+| **Spinners**                | ✅    | ✅         |                                                     |
+| **Text**                    | ✅    | ✅         |                                                     |
+| **Table**                   | ✅    | ✅         |                                                     |
+| **Timeline**                | ✅    | ✅         |                                                     |
+| **Toasts**                  | ✅    | ✅         |                                                     |
+| **Tooltips**                | ✅    | ✅         |                                                     |
 
 #### 🧰 Utilities & Typografie
 

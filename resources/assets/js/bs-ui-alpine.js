@@ -21,7 +21,7 @@ function registerAlpineFunctions() {
 
             // Livewire Hook (für Re-Renders)
             if (typeof Livewire !== 'undefined') {
-                Livewire.hook('commit', ({ component, succeed }) => {
+                Livewire.hook('commit', ({ _component, succeed }) => {
                     succeed(() => {
                         this.$nextTick(() => this.restoreState());
                     });
@@ -1052,6 +1052,356 @@ function registerAlpineFunctions() {
         isBlack(val) {
             const v = val.toLowerCase().trim();
             return v === 'black' || v === '#000' || v === '#000000' || v === 'rgb(0,0,0)';
+        }
+    }));
+
+    Alpine.data('bsAutocomplete', ({ searchModel, selectModel, selectField, isStatic, minChars }) => ({
+        isOpen: false,
+        highlightIndex: -1,
+        searchModel: searchModel,
+        selectModel: selectModel,
+        selectField: selectField,
+        isStatic: isStatic,
+        searchTerm: '',
+        filteredCount: 0,
+        staticItems: [],
+        minChars: minChars || 2,
+        observer: null,
+        pendingOpen: false,
+
+        init() {
+            if (this.isStatic) {
+                this.$nextTick(() => {
+                    this.loadStaticItems();
+                });
+            } else {
+                this.$nextTick(() => {
+                    this.setupLivewireObserver();
+                });
+            }
+        },
+
+        setupLivewireObserver() {
+            const dropdown = this.$refs.livewireDropdown;
+            if (!dropdown) {
+                console.log('livewireDropdown ref not found, retrying...');
+                setTimeout(() => this.setupLivewireObserver(), 100);
+                return;
+            }
+
+            this.observer = new MutationObserver((_mutations) => {
+                this.$nextTick(() => {
+                    this.checkLivewireResults();
+                });
+            });
+
+            this.observer.observe(dropdown, {
+                childList: true,
+                subtree: true,
+            });
+
+            this.checkLivewireResults();
+        },
+
+        checkLivewireResults() {
+            const items = this.$refs.livewireResults?.querySelectorAll('li') || [];
+            const count = items.length;
+
+            this.filteredCount = count;
+
+            if (count > 0 && this.meetsMinChars()) {
+                if (document.activeElement === this.$refs.input || this.pendingOpen) {
+                    if (!this.isExactMatch()) {
+                        this.isOpen = true;
+                        this.highlightIndex = 0;
+                    }
+                    this.pendingOpen = false;
+                }
+            } else if (count === 0 && !this.isOpen) {
+                if (this.meetsMinChars() && document.activeElement === this.$refs.input) {
+                    this.pendingOpen = true;
+                }
+            }
+        },
+
+        loadStaticItems() {
+            if (!this.$refs.staticItems) return;
+
+            const items = this.$refs.staticItems.querySelectorAll('[data-autocomplete-item]');
+
+            this.staticItems = Array.from(items).map((el, index) => ({
+                element: el,
+                value: el.dataset.value,
+                label: el.dataset.label,
+                index: index,
+                visible: true,
+                visibleIndex: index
+            }));
+
+            this.filteredCount = this.staticItems.length;
+        },
+
+        meetsMinChars() {
+            if (this.isStatic) {
+                return this.searchTerm.length >= this.minChars;
+            } else {
+                const value = this.$refs.input?.value || '';
+                return value.length >= this.minChars;
+            }
+        },
+
+        isExactMatch() {
+            const inputValue = this.isStatic ? this.searchTerm.trim() : this.$refs.input?.value.trim() || '';
+
+            if (!inputValue) return false;
+
+            if (this.isStatic) {
+                return this.staticItems.some(item =>
+                    item.label.toLowerCase() === inputValue.toLowerCase()
+                );
+            } else {
+                const items = this.$refs.livewireResults?.querySelectorAll('[data-display]') || [];
+                return Array.from(items).some(item =>
+                    item.dataset.display.toLowerCase() === inputValue.toLowerCase()
+                );
+            }
+        },
+
+        onFocus() {
+            if (this.isExactMatch()) {
+                return;
+            }
+
+            if (!this.isStatic) {
+                this.pendingOpen = true;
+                this.checkLivewireResults();
+            } else {
+                if (this.meetsMinChars()) {
+                    this.openDropdown();
+                }
+            }
+        },
+
+        onInputChange() {
+            if (this.isStatic) {
+                if (this.meetsMinChars()) {
+                    this.filterStaticItems();
+                } else {
+                    this.closeDropdown();
+                }
+            } else {
+                if (this.meetsMinChars()) {
+                    this.pendingOpen = true;
+                } else {
+                    this.closeDropdown();
+                    this.pendingOpen = false;
+                }
+            }
+        },
+
+        filterStaticItems() {
+            const term = this.searchTerm.toLowerCase().trim();
+            let visibleCount = 0;
+
+            this.staticItems.forEach((item) => {
+                const matches = item.label.toLowerCase().includes(term);
+                item.visible = matches;
+                item.element.style.display = matches ? '' : 'none';
+
+                if (matches) {
+                    item.visibleIndex = visibleCount;
+                    visibleCount++;
+                }
+            });
+
+            this.filteredCount = visibleCount;
+            this.highlightIndex = visibleCount > 0 ? 0 : -1;
+
+            if (visibleCount > 0 && this.meetsMinChars() && !this.isExactMatch()) {
+                this.isOpen = true;
+            } else if (this.isExactMatch()) {
+                this.isOpen = false;
+            }
+        },
+
+        openDropdown() {
+            if (!this.meetsMinChars() || this.isExactMatch()) {
+                return;
+            }
+
+            if (this.isStatic && this.staticItems.length === 0) {
+                this.loadStaticItems();
+            }
+
+            if (this.isStatic) {
+                this.filterStaticItems();
+            }
+
+            this.isOpen = true;
+            this.highlightIndex = 0;
+        },
+
+        closeDropdown() {
+            this.isOpen = false;
+            this.highlightIndex = -1;
+            this.pendingOpen = false;
+        },
+
+        onArrowDown() {
+            if (!this.isOpen) {
+                if (this.meetsMinChars() && !this.isExactMatch()) {
+                    this.openDropdown();
+                }
+                return;
+            }
+
+            if (this.highlightIndex < this.filteredCount - 1) {
+                this.highlightIndex++;
+                this.scrollToHighlighted();
+            } else {
+                this.highlightIndex = 0;
+                this.scrollToHighlighted();
+            }
+        },
+
+        onArrowUp() {
+            if (!this.isOpen) return;
+
+            if (this.highlightIndex > 0) {
+                this.highlightIndex--;
+                this.scrollToHighlighted();
+            } else {
+                this.highlightIndex = this.filteredCount - 1;
+                this.scrollToHighlighted();
+            }
+        },
+
+        scrollToHighlighted() {
+            this.$nextTick(() => {
+                let highlightedEl;
+
+                if (this.isStatic) {
+                    const visibleItems = this.staticItems.filter(item => item.visible);
+                    const item = visibleItems[this.highlightIndex];
+                    if (item) {
+                        highlightedEl = item.element.querySelector('a');
+                    }
+                } else {
+                    // Suche im livewireDropdown, nicht in $el
+                    highlightedEl = this.$refs.livewireDropdown?.querySelector(`[data-index='${this.highlightIndex}']`);
+                }
+
+                if (highlightedEl) {
+                    highlightedEl.scrollIntoView({
+                        block: 'nearest',
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        },
+
+        onEnter() {
+            if (!this.isOpen || this.highlightIndex < 0) {
+                return;
+            }
+
+            if (this.isStatic) {
+                const visibleItems = this.staticItems.filter(item => item.visible);
+                const item = visibleItems[this.highlightIndex];
+
+                if (item) {
+                    this.selectStaticItem(item);
+                } else {
+                    console.error('Item not found at index', this.highlightIndex);
+                }
+            } else {
+
+                // Suche im livewireDropdown oder livewireResults, nicht in $el
+                let el = this.$refs.livewireDropdown?.querySelector(`[data-index='${this.highlightIndex}']`);
+
+                if (!el) {
+                    el = this.$refs.livewireResults?.querySelector(`li:nth-child(${this.highlightIndex + 1}) a[data-index]`);
+                }
+
+
+                if (el) {
+                    this.selectItem(el);
+                } else {
+                    console.error('Element not found for index', this.highlightIndex);
+                    console.log('livewireDropdown:', this.$refs.livewireDropdown);
+                    console.log('All [data-index] elements:', this.$refs.livewireDropdown?.querySelectorAll('[data-index]'));
+                }
+            }
+        },
+
+        isHighlighted(linkEl) {
+            if (!this.isStatic) return false;
+
+            const li = linkEl.closest('[data-autocomplete-item]');
+            const item = this.staticItems.find(i => i.element === li);
+
+            return item && item.visible && item.visibleIndex === this.highlightIndex;
+        },
+
+        highlightByElement(linkEl) {
+            if (!this.isStatic) return;
+
+            const li = linkEl.closest('[data-autocomplete-item]');
+            const item = this.staticItems.find(i => i.element === li);
+
+            if (item && item.visible) {
+                this.highlightIndex = item.visibleIndex;
+            }
+        },
+
+        selectFromStatic(linkEl) {
+            const li = linkEl.closest('[data-autocomplete-item]');
+            const item = this.staticItems.find(i => i.element === li);
+            if (item) {
+                this.selectStaticItem(item);
+            }
+        },
+
+        selectStaticItem(item) {
+            this.searchTerm = item.label;
+
+            if (this.$wire && this.selectModel) {
+                this.$wire.set(this.selectModel, item.value);
+            }
+
+            this.closeDropdown();
+
+            this.$dispatch('autocomplete-selected', {
+                value: item.value,
+                display: item.label
+            });
+        },
+
+        selectItem(el) {
+            const selectValue = el.dataset.select;
+            const displayValue = el.dataset.display;
+
+            if (this.$wire) {
+                if (this.selectModel) {
+                    this.$wire.set(this.selectModel, selectValue);
+                }
+                if (this.searchModel) {
+                    this.$wire.set(this.searchModel, displayValue);
+                }
+            }
+
+            this.closeDropdown();
+
+            this.$dispatch('autocomplete-selected', {
+                value: selectValue,
+                display: displayValue
+            });
+        },
+
+        destroy() {
+            if (this.observer) {
+                this.observer.disconnect();
+            }
         }
     }));
 }
