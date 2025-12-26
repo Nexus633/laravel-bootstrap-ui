@@ -40,14 +40,14 @@
 |-----------------------------|------|-----------|-----------------------------------------------------|
 | **Accordion**               | ✅    | ✅         |                                                     |
 | **Alerts**                  | ✅    | ✅         |                                                     |
-| **Autocomplete**            | 🚧   | ❌         | Kann sowohl Live als auch Statisch verwendet werden |
+| **Autocomplete**            | ✅    | 📝        | Kann sowohl Live als auch Statisch verwendet werden |
 | **Avatar**                  | ✅    | ✅         |                                                     |
 | **Badge**                   | ✅    | ✅         |                                                     |
 | **Button / Group**          | ✅    | ✅         |                                                     |
 | **Card**                    | ✅    | ✅         |                                                     |
 | **Carousel**                | ✅    | ✅         |                                                     |
 | **Charts**                  | ✅    | ✅         |                                                     |
-| **Code Block**              | 🚧   | ❌         |                                                     |
+| **Code Block**              | ✅    | 📝        | CodeHighlighterService &  CodeHighlighter Facade    |
 | **Collapse**                | ✅    | ✅         |                                                     |
 | **Container**               | ✅    | ✅         |                                                     |
 | **Empty State**             | ✅    | ✅         |                                                     |
