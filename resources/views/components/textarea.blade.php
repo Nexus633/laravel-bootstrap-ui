@@ -9,7 +9,7 @@
 
 @php
     // ID generieren falls nicht übergeben
-    $id = $attributes->get('id') ?? 'textarea-' . uniqid();
+    $id = $attributes->get('id', 'textarea-' . uniqid());
 
     // Floating Logic extrahieren (Konsistent mit Input-Komponente)
     $isFloating = filter_var($attributes->get('label:floating'), FILTER_VALIDATE_BOOLEAN);

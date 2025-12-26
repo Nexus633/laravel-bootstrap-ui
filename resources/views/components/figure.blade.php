@@ -14,7 +14,7 @@
     $captionClass = 'text-start';
 
     // 2. Textgröße der Caption (Standard: 'sm')
-    $captionSize = $attributes->get('caption:size') ?? $captionSize;
+    $captionSize = $attributes->get('caption:size', $captionSize);
 
 
     // Boolean Flags prüfen

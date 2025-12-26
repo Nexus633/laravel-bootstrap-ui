@@ -11,8 +11,8 @@
 ])
 
 @php
-    $id = $attributes->get('id') ?? 'auto_' . uniqid();
-    $name = $attributes->get('name') ?? 'auto_' . uniqid();
+    $id = $attributes->get('id', 'auto_' . uniqid());
+    $name = $attributes->get('name', 'auto_' . uniqid());
     $hasResults = count($results) > 0;
     $hasSlot = !$slot->isEmpty();
 

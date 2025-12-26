@@ -2,14 +2,17 @@
 
 namespace Nexus633\BootstrapUi;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Nexus633\BootstrapUi\Services\CodeHighlighterService;
 use Nexus633\BootstrapUi\Services\FlashService;
 use Nexus633\BootstrapUi\Services\IconService;
 use Nexus633\BootstrapUi\Services\ModalService;
 use Nexus633\BootstrapUi\Services\ThemeService;
 use Nexus633\BootstrapUi\Services\ToastService;
 use Nexus633\BootstrapUi\Services\TreeViewService;
+use Nexus633\BootstrapUi\View\Components\CodeBlock;
 
 class BootstrapUiServiceProvider extends ServiceProvider
 {
@@ -19,7 +22,6 @@ class BootstrapUiServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'bs');
         // Translation registrieren
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'bs');
-
 
         $this->bootRoutes();
         $this->bootBladeDirective();
@@ -63,6 +65,10 @@ class BootstrapUiServiceProvider extends ServiceProvider
 
         $this->app->singleton('bs-tree-view', function () {
             return new TreeViewService();
+        });
+
+        $this->app->singleton('bs-code-highlighter', function () {
+            return new CodeHighlighterService();
         });
     }
 

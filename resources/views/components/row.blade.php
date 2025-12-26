@@ -16,8 +16,8 @@
 
 @php
     // Priorität: Attribut > Prop
-    $vAlign = $attributes->get('align:vertical') ?? $vAlign;
-    $hAlign = $attributes->get('align:horizontal') ?? $hAlign;
+    $vAlign = $attributes->get('align:vertical', $vAlign);
+    $hAlign = $attributes->get('align:horizontal', $hAlign);
 
     // Attribute bereinigen (damit align:vertical nicht im HTML output steht)
     $attributes = $attributes->except(['align:vertical', 'align:horizontal']);

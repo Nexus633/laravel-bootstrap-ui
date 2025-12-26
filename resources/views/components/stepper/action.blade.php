@@ -7,9 +7,9 @@
 ])
 
 @php
-    $iconFinished = $attributes->get('icon:finished') ?? $iconFinished;
-    $iconNext = $attributes->get('icon:next') ?? $iconNext;
-    $iconLast = $attributes->get('icon:last') ?? $iconLast;
+    $iconFinished = $attributes->get('icon:finished', $iconFinished);
+    $iconNext = $attributes->get('icon:next', $iconNext);
+    $iconLast = $attributes->get('icon:last', $iconLast);
 
     $attributes = $attributes->except(['icon:finished', 'icon:next', 'icon:last']);
 @endphp

@@ -1,5 +1,9 @@
 {{-- resources/views/components/layouts/dashboard.blade.php --}}
-@props(['title' => null])
+@props([
+    'title' => null,
+    'editor' => config('bootstrap-ui.scripts.editor'),
+    'charts' => config('bootstrap-ui.scripts.charts'),
+])
 
 <!doctype html>
 <html lang="de" class="h-100" xmlns:x-bs="http://www.w3.org/1999/html">
@@ -7,7 +11,7 @@
     <title>{{ $title ?? config('app.name') }}</title>
 
     {{-- Deine Head Komponente (Bootstrap CSS, Meta Tags etc.) --}}
-    <x-bs::head editor/>
+    <x-bs::head editor="{{ $editor }}"/>
 
     @livewireStyles
 </head>
@@ -65,7 +69,7 @@
 
     </x-bs::body.main>
 
-    <x-bs::scripts charts editor/>
+    <x-bs::scripts editor="{{ $editor }}" charts="{{ $charts }}" />
     @livewireScripts
 </x-bs::body>
 </html>

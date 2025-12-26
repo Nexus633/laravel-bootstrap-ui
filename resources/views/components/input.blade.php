@@ -13,7 +13,7 @@
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
 
-    $id = $attributes->get('id') ?? 'input-' . uniqid();
+    $id = $attributes->get('id', 'input-' . uniqid());
 
     // Floating Logic extrahieren
     $isFloating = filter_var($attributes->get('label:floating'), FILTER_VALIDATE_BOOLEAN);

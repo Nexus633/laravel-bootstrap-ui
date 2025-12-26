@@ -8,7 +8,7 @@
 ])
 
 @php
-    $id = $attributes->get('id') ?? 'range-' . uniqid();
+    $id = $attributes->get('id', 'range-' . uniqid());
     $hasError = $name && $errors->has($name);
 @endphp
 

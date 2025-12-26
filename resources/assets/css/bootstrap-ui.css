@@ -403,3 +403,60 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .bs-shortcut {
     display: none;
 }
+
+/* --- Blade Syntax Highlighting Custom Classes --- */
+
+.code-block-container {
+    background-color: #0d1117 !important; /* GitHub Dark Background */
+    color: #c9d1d9 !important;            /* GitHub Base Text */
+    border-radius: 6px;
+}
+
+.code-block-template {
+    display: block;
+    outline: none;
+    min-width: 0;
+}
+
+.code-block-pre {
+    margin: 0 !important;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.code-block-line-numbers {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+}
+
+/* --- Blade Custom Syntax (Unsere PHP Logik) --- */
+
+/* <x-bs (Prefix) -> Grün (wie HTML Tags bei GitHub) */
+.hljs-bs-prefix {
+    color: #7ee787 !important;
+}
+
+/* :: und . (Separator) -> Grau */
+.hljs-bs-separator {
+    color: #8b949e !important;
+}
+
+/* autocomplete (Name) -> Hellblau (wie Tag-Inhalte) */
+.hljs-bs-name {
+    color: #a5d6ff !important;
+    font-weight: bold;
+}
+
+/* wire:model, :props (Attribute) -> Lila */
+.hljs-bs-attribute {
+    color: #d2a8ff !important;
+}
+
+.avatar-group > * + * {
+     margin-left: -0.8rem; /* Überlappung */
+ }
+.avatar-group > *:hover {
+    z-index: 10;
+    position: relative;
+}

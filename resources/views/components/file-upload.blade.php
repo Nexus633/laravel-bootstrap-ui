@@ -13,7 +13,7 @@
 ])
 
 @php
-    $id = $attributes->get('id') ?? 'fileUpload-' . Str::slug($name);
+    $id = $attributes->get('id', 'fileUpload-' . Str::slug($name));
     $isMultiple = $multiple || $attributes->has('multiple');
 
     // Preview Target bestimmen

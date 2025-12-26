@@ -9,8 +9,8 @@
 
 @php
 
-    $captionTitle = $attributes->get('caption:title') ?? $captionTitle;
-    $captionText = $attributes->get('caption:text') ?? $captionText;
+    $captionTitle = $attributes->get('caption:title', $captionTitle);
+    $captionText = $attributes->get('caption:text', $captionText);
     $attributes = $attributes->except(['caption:title', 'caption:text']);
     $classes = [
         'carousel-item',

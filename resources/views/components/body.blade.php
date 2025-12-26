@@ -3,7 +3,7 @@
 ])
 
 @php
-    $bodyVariant = $attributes->get('body:variant') ?? $bodyVariant;
+    $bodyVariant = $attributes->get('body:variant', $bodyVariant);
     $attributes = $attributes->except(['body:variant']);
 
     $bodyColor = 'bg-body-' . $bodyVariant;

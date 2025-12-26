@@ -10,7 +10,7 @@
 @php
     // ID generieren (für Label-Verknüpfung)
     $wireModel = $attributes->wire('model');
-    $id = $attributes->get('id') ?? 'select-' . uniqid();
+    $id = $attributes->get('id', 'select-' . uniqid());
 
     // Fehler prüfen
     $hasError = $name && $errors->has($name);

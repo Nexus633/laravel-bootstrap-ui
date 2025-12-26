@@ -8,7 +8,7 @@
 
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
-    $id = $attributes->get('id') ?? 'btn-' . uniqid();
+    $id = $attributes->get('id', 'btn-' . uniqid());
     $classes = 'btn';
     if($variant){
         $classes .= ' btn-' . $variant;
@@ -17,8 +17,8 @@
     if($size) $classes .= ' btn-' . $size;
 
     // Falls Attribut vorhanden, entsprechend nehmen
-    $lightIcon = $attributes->get('icon:light') ?? $lightIcon;
-    $darkIcon = $attributes->get('icon:dark') ?? $darkIcon;
+    $lightIcon = $attributes->get('icon:light', $lightIcon) ;
+    $darkIcon = $attributes->get('icon:dark', $darkIcon);
 
     $lightIcon = Icon::toClass($lightIcon);
     $darkIcon = Icon::toClass($darkIcon);

@@ -12,11 +12,11 @@
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
 
-    $id = $attributes->get('id') ?? 'password-' . uniqid();
+    $id = $attributes->get('id', 'password-' . uniqid());
 
     // Icon Logic
-    $toggleShowIcon = Icon::toClass($attributes->get('toggle:show') ?? $toggleShowIcon);
-    $toggleHideIcon = Icon::toClass($attributes->get('toggle:hide') ?? $toggleHideIcon);
+    $toggleShowIcon = Icon::toClass($attributes->get('toggle:show', $toggleShowIcon));
+    $toggleHideIcon = Icon::toClass($attributes->get('toggle:hide', $toggleHideIcon));
     $iconClass      = $icon ? Icon::toClass($icon) : null;
 
     // Attribute bereinigen

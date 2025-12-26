@@ -22,13 +22,13 @@
 ])
 
 @php
-    $valueId = $attributes->get('id') ?? 'kvb-' . uniqid();
+    $valueId = $attributes->get('id', 'kvb-' . uniqid());
 
-    $labelSm = $attributes->get('label:sm') ?? $labelSm;
-    $labelMd = $attributes->get('label:md') ?? $labelMd;
-    $labelLg = $attributes->get('label:lg') ?? $labelLg;
-    $labelXl = $attributes->get('label:xl') ?? $labelXl;
-    $labelXxl = $attributes->get('label:xxl') ?? $labelXxl;
+    $labelSm = $attributes->get('label:sm', $labelSm);
+    $labelMd = $attributes->get('label:md', $labelMd);
+    $labelLg = $attributes->get('label:lg', $labelLg);
+    $labelXl = $attributes->get('label:xl', $labelXl);
+    $labelXxl = $attributes->get('label:xxl', $labelXxl);
 
     $attributes = $attributes->except([
         'label:sm', 'label:md', 'label:lg', 'label:xl', 'label:xxl'

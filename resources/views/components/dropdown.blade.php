@@ -12,7 +12,7 @@
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
 
-    $noCaret = $attributes->get('no:caret') ?? $noCaret;
+    $noCaret = $attributes->get('no:caret', $noCaret);
     $iconClass = Icon::toClass($icon);
 
     // --- 1. MODUS ENTSCHEIDUNG ---

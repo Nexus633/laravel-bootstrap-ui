@@ -1,7 +1,7 @@
 <?php
 return [
     'button' => [
-        'InvalidArgumentException' => 'Button kann nicht gleichzeitig collapse und offcanvas verwenden'
+        'InvalidArgumentException' => 'Button kann nicht gleichzeitig collapse und offcanvas verwenden',
     ],
     'input' => [
         'tags' => [
@@ -81,5 +81,9 @@ return [
         'tooltip' => [
             'copy' => 'Kopieren'
         ]
+    ],
+    'code-block' => [
+        'copy' => 'Kopieren',
+        'formatted' => 'Formatierung umschalten',
     ]
 ];

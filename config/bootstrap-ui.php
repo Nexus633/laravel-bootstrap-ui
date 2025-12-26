@@ -582,5 +582,6 @@ return [
                 'shell_exec',
             ],
         ],
-    ]
+
+    ],
 ];

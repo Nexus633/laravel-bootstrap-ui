@@ -10,7 +10,7 @@
 ])
 
 @php
-    $vAlign = $attributes->get('align:vertical') ?? $vAlign;
+    $vAlign = $attributes->get('align:vertical', $vAlign);
     $attributes = $attributes->except('align:vertical');
 
     $classes = [];

@@ -8,7 +8,7 @@
 ])
 
 @php
-    $id = $attributes->get('id') ?? 'editor-' . uniqid();
+    $id = $attributes->get('id', 'editor-' . uniqid());
     $wireModel = $attributes->wire('model');
     $alpineValue = 'null';
     $debounceTime = 0; // Standard: 0 (bzw. Livewire Default wenn live)

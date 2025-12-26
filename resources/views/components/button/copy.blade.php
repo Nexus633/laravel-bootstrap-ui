@@ -13,9 +13,9 @@
 ])
 
 @php
-    $successIcon = $attributes->get('icon:success') ?? $successIcon;
-    $successLabel = $attributes->get('label:success') ?? $successLabel;
-    $successVariant = $attributes->get('variant:success') ?? $successVariant;
+    $successIcon = $attributes->get('icon:success', $successIcon);
+    $successLabel = $attributes->get('label:success', $successLabel);
+    $successVariant = $attributes->get('variant:success', $successVariant);
 
     $attributes = $attributes->except(['icon:success', 'label:success', 'variant:success']);
 

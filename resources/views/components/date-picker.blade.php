@@ -15,7 +15,7 @@
 ])
 
 @php
-    $id = $attributes->get('id') ?? 'datepicker-' . uniqid();
+    $id = $attributes->get('id', 'datepicker-' . uniqid());
     $wireModel = $attributes->wire('model');
     $pickerId = 'dp-' . md5($name . $id);
 
@@ -32,16 +32,16 @@
 
     // --- ICON LOGIC ---
     // 1. Prepend: Prop 'icon' oder Attribut 'icon:prepend'
-    $iconPrepend = $attributes->get('icon:prepend') ?? $icon;
+    $iconPrepend = $attributes->get('icon:prepend', $icon);
     if ($iconPrepend === 'false' || $iconPrepend === false) $iconPrepend = null;
 
     // 2. Append: Attribut 'icon:append'
     $iconAppend = $attributes->get('icon:append');
 
-    $iconPrependStart = $attributes->get('icon:prepend:start')  ?? $icon;
+    $iconPrependStart = $attributes->get('icon:prepend:start', $icon);
     $iconAppendStart = $attributes->get('icon:append:start');
 
-    $iconPrependEnd = $attributes->get('icon:prepend:end')  ?? $icon;
+    $iconPrependEnd = $attributes->get('icon:prepend:end', $icon);
     $iconAppendEnd = $attributes->get('icon:append:end');
 
     $attributes = $attributes->except(['icon:prepend', 'icon:append', 'icon:prepend:start', 'icon:append:start', 'icon:prepend:end', 'icon:append:end'])

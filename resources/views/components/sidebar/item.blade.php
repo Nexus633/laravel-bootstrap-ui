@@ -10,8 +10,8 @@
 
 @php
     // CustomAttributs
-    $badgeVariant = $attributes->get('badge:variant') ?? $badgeVariant;
-    $activeVariant = $attributes->get('active:variant') ?? $activeVariant;
+    $badgeVariant = $attributes->get('badge:variant', $badgeVariant);
+    $activeVariant = $attributes->get('active:variant', $activeVariant);
 
     $attributes = $attributes->except(['badge:variant', 'active:variant']);
 

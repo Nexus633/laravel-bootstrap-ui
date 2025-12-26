@@ -10,7 +10,7 @@
 
 @php
 
-    $verticalBetween = $attributes->get('vertical:between') ?? $verticalBetween;
+    $verticalBetween = $attributes->get('vertical:between', $verticalBetween);
     $attributes = $attributes->except(['vertical:between']);
 
     // 1. Text-Farbe via Bootstrap Klasse (z.B. text-danger)

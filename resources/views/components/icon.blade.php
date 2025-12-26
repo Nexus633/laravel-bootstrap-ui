@@ -11,7 +11,7 @@
 ])
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
-    $asInput = $attributes->get('as:input') ?? $asInput;
+    $asInput = $attributes->get('as:input', $asInput);
 
     // 1. Basis-Klasse
     $classes = Icon::toClass($name);

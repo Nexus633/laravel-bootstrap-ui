@@ -47,6 +47,7 @@
 | **Card**                    | ✅    | ✅         |                                                     |
 | **Carousel**                | ✅    | ✅         |                                                     |
 | **Charts**                  | ✅    | ✅         |                                                     |
+| **Code Block**              | 🚧   | ❌         |                                                     |
 | **Collapse**                | ✅    | ✅         |                                                     |
 | **Container**               | ✅    | ✅         |                                                     |
 | **Empty State**             | ✅    | ✅         |                                                     |

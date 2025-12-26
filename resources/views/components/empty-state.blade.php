@@ -12,7 +12,7 @@
 
 @php
     // Attribut gewinnt vor Prop (ermöglicht <x-bs::empty-state icon:size="2" ... />)
-    $iconSize = $attributes->get('icon:size') ?? $iconSize;
+    $iconSize = $attributes->get('icon:size', $iconSize);
     $attributes = $attributes->except('icon:size');
 @endphp
 

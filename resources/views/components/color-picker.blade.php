@@ -10,7 +10,7 @@
 ])
 
 @php
-    $id = $attributes->get('id') ?? 'cp-' . uniqid();
+    $id = $attributes->get('id', 'cp-' . uniqid());
 
     // Livewire Logik: Wir bereiten das Model vor
     $wireModel = $attributes->wire('model');
@@ -21,7 +21,7 @@
     } else {
         // Falls kein Livewire: Nutze den 'value' prop oder default '#000000'
         // json_encode sorgt dafür, dass Strings sicher an JS übergeben werden
-        $val = $attributes->get('value') ?? '#000000';
+        $val = $attributes->get('value', '#000000');
         $alpineValue = json_encode($val);
     }
 @endphp

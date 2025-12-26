@@ -25,8 +25,8 @@
 ])
 
 @php
-    $icon = $attributes->get('icon:prepend') ?? $icon;
-    $iconAppend = $attributes->get('icon:append') ?? $iconAppend;
+    $icon = $attributes->get('icon:prepend', $icon);
+    $iconAppend = $attributes->get('icon:append', $iconAppend);
     $attributes = $attributes->except(['icon:prepend', 'icon:append']);
 
     $classes = [];

@@ -22,7 +22,7 @@
         $icon = Icon::toClass($icon);
     }
 
-    $iconFs = $attributes->get('icon:fs') ?? $iconFs;
+    $iconFs = $attributes->get('icon:fs', $iconFs);
     $attributes = $attributes->except(['icon:fs']);
 
     //if($iconFs) $iconFs = 'fs-' . $iconFs;
