@@ -7,6 +7,278 @@ if (!window.__bs_alpine_registered) {
     });
 }
 function registerAlpineFunctions() {
+
+    // ==========================================
+    // Flashes
+    // ==========================================
+    Alpine.data('bsFlash', (config) => ({
+        alerts: config.initial || [],
+        autoDismiss: config.autoDismiss || 0,
+        animate: config.animate || false,
+        classes: {
+            enter: config.enterClass || '',
+            leave: config.leaveClass || ''
+        },
+        iconMap: config.icons || {},
+
+        // Speicher für Event-Listener und Timer
+        _windowHandler: null,
+        _timers: new Map(), // Map<AlertID, TimeoutID>
+
+        init() {
+            // Window Listener sauber registrieren
+            this._windowHandler = (e) => this.add(e.detail.flash);
+            window.addEventListener('bs-flash-message', this._windowHandler);
+        },
+
+        destroy() {
+            // 1. Listener entfernen
+            if (this._windowHandler) {
+                window.removeEventListener('bs-flash-message', this._windowHandler);
+            }
+
+            // 2. Alle offenen Timer killen
+            this._timers.forEach(timerId => clearTimeout(timerId));
+            this._timers.clear();
+        },
+
+        add(detail) {
+            if (this.alerts.some(a => a.message === detail.message && a.variant === detail.variant)) {
+                return;
+            }
+
+            const id = detail.id || ('live-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
+
+            // NEU: Icon Logik nutzt die Config Map statt hardcoded Strings
+            let icon = detail.icon;
+            if (!icon) {
+                // Fallback auf die Map, die wir von PHP bekommen haben
+                icon = this.iconMap[detail.variant] || this.iconMap['default'] || '';
+            }
+
+            this.alerts.push({
+                id: id,
+                variant: detail.variant,
+                message: detail.message,
+                title: detail.title,
+                icon: icon
+            });
+        },
+
+        setupAutoDismiss(element, id) {
+            if (this.autoDismiss > 0) {
+                // Timer speichern, damit wir ihn bei destroy() löschen können
+                const timerId = setTimeout(() => {
+                    this.handleRemove(element, id);
+                }, this.autoDismiss);
+
+                this._timers.set(id, timerId);
+            }
+        },
+
+        handleRemove(element, id) {
+            // Falls ein Timer lief (AutoDismiss), diesen löschen, da wir jetzt manuell entfernen
+            if (this._timers.has(id)) {
+                clearTimeout(this._timers.get(id));
+                this._timers.delete(id);
+            }
+
+            if (this.animate && element) {
+                element.classList.add(this.classes.leave);
+
+                // Warten auf Animation, dann aus Array löschen
+                setTimeout(() => {
+                    this.removeFromArray(id);
+                }, 250); // Hardcoded oder via CSS Variable lösbar
+            } else {
+                this.removeFromArray(id);
+            }
+        },
+
+        removeFromArray(id) {
+            this.alerts = this.alerts.filter(a => a.id !== id);
+            // Sicherstellen, dass Timer aus Map raus ist
+            if (this._timers.has(id)) this._timers.delete(id);
+        }
+    }));
+
+    // ==========================================
+    // Toasts
+    // ==========================================
+    Alpine.data('bsToastStack', (config) => ({
+        toasts: config.initial || [],
+        duration: config.duration || 5000,
+        animate: config.animate || false,
+        animationType: config.animationType || 'fade',
+
+        // Internals
+        _windowHandler: null,
+        _timers: new Map(), // Map<ID, TimerID>
+
+        init() {
+            // 1. Initiale Toasts: Auto-Dismiss starten
+            if (this.duration > 0) {
+                this.toasts.forEach(t => this.scheduleDismiss(t.id));
+            }
+
+            // 2. Globaler Listener
+            this._windowHandler = (e) => this.add(e.detail.toast);
+            window.addEventListener('bs-toast-message', this._windowHandler);
+        },
+
+        destroy() {
+            // Cleanup Listener
+            if (this._windowHandler) {
+                window.removeEventListener('bs-toast-message', this._windowHandler);
+            }
+
+            // Cleanup Timers
+            this._timers.forEach(timerId => clearTimeout(timerId));
+            this._timers.clear();
+        },
+
+        add(detail) {
+            const id = 'toast-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+
+            // Icon Logik (Fallback)
+            let icon = detail.icon;
+            if (!icon) {
+                const variants = {
+                    'success': 'bi bi-check-circle-fill text-success',
+                    'danger': 'bi bi-x-circle-fill text-danger',
+                    'warning': 'bi bi-exclamation-circle-fill text-warning',
+                    'info': 'bi bi-info-circle-fill text-info'
+                };
+                icon = variants[detail.variant] || 'bi bi-bell-fill';
+            }
+
+            // Timestamp generieren falls fehlt
+            const time = detail.timestamp || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const toast = {
+                id: id,
+                variant: detail.variant,
+                title: detail.title,
+                message: detail.message,
+                timestamp: time,
+                icon: icon
+            };
+
+            this.toasts.push(toast);
+
+            // Timer starten
+            if (this.duration > 0) {
+                this.scheduleDismiss(id);
+            }
+        },
+
+        scheduleDismiss(id) {
+            // Falls schon ein Timer existiert (theoretisch), löschen
+            if (this._timers.has(id)) clearTimeout(this._timers.get(id));
+
+            const timerId = setTimeout(() => {
+                this.remove(id);
+            }, this.duration);
+
+            this._timers.set(id, timerId);
+        },
+
+        remove(id) {
+            // Timer aufräumen
+            if (this._timers.has(id)) {
+                clearTimeout(this._timers.get(id));
+                this._timers.delete(id);
+            }
+
+            const element = document.querySelector(`[data-toast-id='${id}']`);
+
+            // Wenn Animation gewünscht und Element noch im DOM
+            if (element && this.animate) {
+                // Enter-Klasse weg, Exit-Klasse rein
+                element.classList.remove('toast-enter-' + this.animationType);
+                element.classList.add('toast-hiding-' + this.animationType);
+
+                // Warten bis Animation durch ist (300ms hardcoded oder via CSS var)
+                setTimeout(() => {
+                    this.removeFromArray(id);
+                }, 300);
+            } else {
+                // Sofort weg
+                this.removeFromArray(id);
+            }
+        },
+
+        removeFromArray(id) {
+            this.toasts = this.toasts.filter(t => t.id !== id);
+        },
+
+        getEnterClass() {
+            return this.animate ? 'toast-enter-' + this.animationType : 'toast-no-animation';
+        }
+    }));
+
+    // ==========================================
+    // TAGS INPUT
+    // ==========================================
+    Alpine.data('bsTags', (config) => ({
+        // Entangle Object oder Array
+        tags: config.model,
+        newTag: '',
+        max: config.max,
+
+        init() {
+            // Fallback, falls null übergeben wird
+            if (this.tags === null) this.tags = [];
+        },
+
+        add() {
+            let tag = this.newTag.trim();
+
+            // Checks: Nicht leer, nicht doppelt, Limit nicht erreicht
+            if (tag !== '' && !this.tags.includes(tag)) {
+                if (this.max === null || this.tags.length < this.max) {
+                    this.tags.push(tag);
+                }
+            }
+
+            this.newTag = '';
+            this.focusInput();
+        },
+
+        remove(index) {
+            // splice funktioniert sowohl für normale Arrays als auch für Livewire Entangle Proxies
+            this.tags.splice(index, 1);
+            this.focusInput();
+        },
+
+        removeLast() {
+            // Backspace Logik: Nur löschen wenn Input leer ist
+            if (this.newTag === '' && this.tags.length > 0) {
+                this.tags.pop();
+            }
+        },
+
+        isMaxReached() {
+            return this.max !== null && this.tags && this.tags.length >= this.max;
+        },
+
+        focusInput() {
+            // Warten bis DOM updated (z.B. Input wieder sichtbar wird)
+            this.$nextTick(() => {
+                if (!this.isMaxReached() && this.$refs.tagInput) {
+                    this.$refs.tagInput.focus();
+                }
+            });
+        },
+
+        // Click auf den Container fokussiert das Input
+        handleContainerClick() {
+            if (!this.isMaxReached()) {
+                this.focusInput();
+            }
+        }
+    }));
+
     // ==========================================
     // UI STATE (Tabs / Accordion)
     // ==========================================

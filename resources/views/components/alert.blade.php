@@ -9,15 +9,15 @@
     use Nexus633\BootstrapUi\Facades\Icon;
     // Automatische Icon-Wahl basierend auf Variante (Bootstrap Icons)
     if (!$icon) {
-        $icon = match($variant) {
-            'success' => 'bi bi-check-circle-fill',
-            'danger', 'error' => 'bi bi-exclamation-triangle-fill', // 'error' als Alias für danger
-            'warning' => 'bi bi-exclamation-circle-fill',
-            'info' => 'bi bi-info-circle-fill',
-            default => 'bi bi-info-circle',
+        $iconName = match($variant) {
+            'success' => 'check-circle-fill',
+            'danger', 'error' => 'exclamation-triangle-fill', // 'error' als Alias für danger
+            'warning' => 'exclamation-circle-fill',
+            'info' => 'info-circle-fill',
+            default => 'info-circle',
         };
 
-
+        $icon = Icon::toClass($iconName);
     }else{
         $icon = Icon::toClass($icon);
     }

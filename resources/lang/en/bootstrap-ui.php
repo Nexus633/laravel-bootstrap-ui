@@ -5,7 +5,8 @@ return [
     ],
     'input' => [
         'tags' => [
-            'limit_reached' => 'Limit reached (:max)'
+            'limit_reached' => 'Limit reached (:max)',
+            'placeholder' => 'add a Tag'
         ]
     ],
     'date-picker' => [

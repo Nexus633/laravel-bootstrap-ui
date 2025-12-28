@@ -98,7 +98,6 @@ class CodeHighlighterService
 
     private function enhanceBladeSyntax(string $html): string
     {
-        // Deine Regex-Logik von vorhin...
         $html = preg_replace_callback(
             '/(&lt;\/?x-[\w\-]+)(::)([\w\-.]+)/',
             function ($matches) {
@@ -117,7 +116,6 @@ class CodeHighlighterService
 
     private function normalizeCode(string $input): string
     {
-        // Deine Normalize Logik...
         $input = str_replace("\t", "    ", $input);
         $lines = explode("\n", str_replace(["\r\n", "\r"], "\n", $input));
 

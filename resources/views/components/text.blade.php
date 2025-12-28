@@ -1,6 +1,7 @@
 @props([
     'as' => null,
     'variant' => null,
+    'size' => null,
 
     // Struktur
     'h1' => false, 'h2' => false, 'h3' => false, 'h4' => false, 'h5' => false, 'h6' => false,
@@ -115,6 +116,7 @@
     // Optional
     if ($code) $classes[] = 'code-bg';
     if ($blockquote) $classes[] = 'blockquote';
+    if ($size) $classes[] = 'fs-' . $size;
 
 @endphp
 
