@@ -2,7 +2,9 @@
     'uniqueId',
     'floating' => false,
     'copy' => true,
-    'isJson' => false
+    'isJson' => false,
+    'iconExpand' => 'arrows-expand',
+    'iconCollapse' => 'arrows-collapse'
 ])
 
 {{-- 
@@ -24,10 +26,10 @@
         size="sm"
         :class="$btnClass"
         @click="toggleJson()"
-        x-bind:title="isPretty ? 'Minimieren' : 'Formatieren'"
+        x-bind:title="isPretty ? '{{ __('bs::bootstrap-ui.code-block.minimize') }}' : '{{ __('bs::bootstrap-ui.code-block.formatted') }}'"
     >
-        <span x-show="isPretty"><i class="bi bi-arrows-collapse"></i></span>
-        <span x-show="!isPretty"><i class="bi bi-arrows-expand"></i></span>
+        <x-bs::icon x-show="isPretty" :name="$iconCollapse" />
+        <x-bs::icon x-show="!isPretty" :name="$iconExpand" />
     </x-bs::button>
 </template>
 
@@ -38,5 +40,6 @@
         :variant="$btnVariant"
         size="sm"
         :class="$btnClass"
+        :title="__('bs::bootstrap-ui.code-block.copy')"
     />
 @endif

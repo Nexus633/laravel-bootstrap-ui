@@ -3,9 +3,12 @@
     'language' => 'blade',
     'copy' => true,
     'height' => null,
+    'lineVariant' => 'warning',
     'lineNumbers' => false,
     'lineMarks' => [],
     'noCard' => false,
+    'iconExpand' => 'arrows-expand',
+    'iconCollapse' => 'arrows-collapse'
 ])
 
 @php
@@ -14,6 +17,14 @@
 
     $lineNumbers = $attributes->get('line:numbers', $lineNumbers);
     $lineMarks = $attributes->get('line:marks', $lineMarks);
+    $lineVariant = $attributes->get('line:variant', $lineVariant);
+
+    $iconExpand = $attributes->get('icon:expand', $iconExpand);
+    $iconCollapse = $attributes->get('icon:collapse', $iconCollapse);
+
+    $attributes = $attributes->except([
+        'line:numbers', 'line:marks', 'line:variant', 'icon:expand', 'icon:collapse'
+    ]);
 
     $content = $code ?? (string) $slot;
     $uniqueId = 'bs-code-' . uniqid();
@@ -53,7 +64,7 @@
         >
             <x-slot:header>
                 <div class="d-flex justify-content-between align-items-center py-1">
-                    {{-- Nutzung deiner Text-Komponente --}}
+                    {{-- Nutzung der Text-Komponente --}}
                     <x-bs::text
                         variant="body-secondary"
                         small
@@ -68,13 +79,16 @@
                             :unique-id="$uniqueId"
                             :copy="$copy"
                             :floating="false"
+                            :icon-expand="$iconExpand"
+                            :icon-collapse="$iconCollapse"
                         />
                     </div>
                 </div>
             </x-slot:header>
 
             {{-- Inhalt (Code) --}}
-            <x-bs::code-block.code :height="$height" :language="$language"/>
+            <x-bs::code-block.code :height="$height" :language="$language" :line-variant="$lineVariant"/>
+
         </x-bs::card>
     @endif
 
@@ -91,12 +105,13 @@
                         :unique-id="$uniqueId"
                         :copy="$copy"
                         :floating="true"
+                        :icon-expand="$iconExpand"
+                        :icon-collapse="$iconCollapse"
                     />
                 </div>
             </div>
-
             {{-- Inhalt (Code) --}}
-            <x-bs::code-block.code :height="$height" :language="$language"/>
+            <x-bs::code-block.code :height="$height" :language="$language" :line-variant="$lineVariant"/>
         </div>
     @endif
 </div>

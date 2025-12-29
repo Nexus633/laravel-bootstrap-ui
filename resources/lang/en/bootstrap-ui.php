@@ -82,5 +82,10 @@ return [
         'tooltip' => [
             'copy' => 'Copy'
         ]
+    ],
+    'code-block' => [
+        'copy' => 'Copy',
+        'minimize' => 'Minimize',
+        'formatted' => 'Formatting',
     ]
 ];

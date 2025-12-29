@@ -5,7 +5,7 @@
 ])
 
 @php
-    $lineVariant = 'text-' . $lineVariant;
+    if($lineVariant) $lineVariant = 'text-' . $lineVariant;
 @endphp
 
 <div class="p-0 code-block-container bg-body-tertiary position-relative">

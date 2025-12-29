@@ -85,6 +85,7 @@ return [
     ],
     'code-block' => [
         'copy' => 'Kopieren',
-        'formatted' => 'Formatierung umschalten',
+        'minimize' => 'Minimieren',
+        'formatted' => 'Formatieren',
     ]
 ];
