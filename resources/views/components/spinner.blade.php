@@ -6,19 +6,16 @@
 ])
 
 @php
-    $classes = [
-        'spinner-' . $type,
-    ];
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    if ($variant) {
-        $classes[] = 'text-' . $variant;
-    }
-
-    if ($size) {
-        $classes[] = 'spinner-' . $type . '-' . $size;
-    }
+    $field = BootstrapUi::make();
+    $field->addClass('spinner-' . $type)
+          ->addClassWhen($variant, 'text-' . $variant)
+          ->addClassWhen($size, 'spinner-' . $type . '-' . $size)
+          ->addData('role', 'status')
+          ->addData('aria-hidden', 'true');
 @endphp
 
-<div role="status" {{ $attributes->class($classes) }} aria-hidden="true">
+<div {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}>
     <span class="visually-hidden">{{ $label }}</span>
 </div>

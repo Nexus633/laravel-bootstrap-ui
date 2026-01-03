@@ -1,23 +1,25 @@
 @props([
-    'name',
+    'name' => null,
     'label' => null,
-    'options' => [],       // Array: ['value' => 'Label']
-    'placeholder' => null, // Z.B. "Bitte wählen..."
+    'options' => [],
+    'placeholder' => null,
     'hint' => null,
     'disabled' => false,
 ])
 
 @php
-    // ID generieren (für Label-Verknüpfung)
-    $wireModel = $attributes->wire('model');
-    $id = $attributes->get('id', 'select-' . uniqid());
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    // Fehler prüfen
-    $hasError = $name && $errors->has($name);
+    $field = BootstrapUi::make($name);
+
+    $id = $attributes->getOrCreateId('select-');
+    $hasError = $field->hasError();
+
+    $field->addClass('form-select')
+          ->addClassWhen($hasError, 'is-invalid');
 @endphp
 
 <div class="mb-3">
-    {{-- Label --}}
     @if($label)
     <label for="{{ $id }}" class="form-label">
         {{ $label }}
@@ -26,25 +28,21 @@
 
     <select
         id="{{ $id }}"
-        name="{{ $name }}"
+        @if($name) name="{{ $name }}" @endif
         @if($disabled) disabled @endif
-        {{ $attributes->class(['form-select', 'is-invalid' => $hasError]) }}
-        >
-        {{-- 1. Placeholder Option (leer & disabled) --}}
+        {{ $attributes->class($field->getClasses()) }}
+    >
         @if($placeholder)
             <option value="" selected>{{ $placeholder }}</option>
         @endif
 
-        {{-- 2. Automatische Optionen aus Array --}}
         @foreach($options as $value => $text)
             <option value="{{ $value }}">{{ $text }}</option>
         @endforeach
 
-        {{-- 3. Manueller Slot (falls man optgroups oder spezielle Logik braucht) --}}
         {{ $slot }}
     </select>
 
-    {{-- Feedback: Error oder Hint --}}
     @if($hasError)
         <div class="invalid-feedback">
             {{ $errors->first($name) }}

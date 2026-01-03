@@ -15,33 +15,31 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $field = BootstrapUi::make();
+
     // Priorität: Attribut > Prop
-    $vAlign = $attributes->get('align:vertical', $vAlign);
-    $hAlign = $attributes->get('align:horizontal', $hAlign);
+    $vAlign = $attributes->pluck('align:vertical', $vAlign);
+    $hAlign = $attributes->pluck('align:horizontal', $hAlign);
 
-    // Attribute bereinigen (damit align:vertical nicht im HTML output steht)
-    $attributes = $attributes->except(['align:vertical', 'align:horizontal']);
+    $field->addClass('row')
+          ->addClassWhen($g, 'g-' . $g)
+          ->addClassWhen($gx, 'gx-' . $gx)
+          ->addClassWhen($gy, 'gy-' . $gy)
+          // Alignment
+          ->addClassWhen($vAlign, 'align-items-' . $vAlign)
+          ->addClassWhen($hAlign, 'justify-content-' . $hAlign)
+          // Row Cols Logic
+          ->addClassWhen($cols, 'row-cols-' . $cols)
+          ->addClassWhen($sm, 'row-cols-sm-' . $sm)
+          ->addClassWhen($md, 'row-cols-md-' . $md)
+          ->addClassWhen($lg, 'row-cols-lg-' . $lg)
+          ->addClassWhen($xl, 'row-cols-xl-' . $xl)
+          ->addClassWhen($xxl, 'row-cols-xxl-' . $xxl);
 
-    $classes = 'row';
-
-    if ($g !== null)  $classes .= " g-$g";
-    if ($gx !== null) $classes .= " gx-$gx";
-    if ($gy !== null) $classes .= " gy-$gy";
-
-// Alignment
-    if($vAlign !== null) $classes .= ' align-items-' . $vAlign;
-    if($hAlign !== null) $classes .= ' justify-content-' . $hAlign;
-
-    // NEU: Row Cols Logic
-    // Wir hängen die Klasse nur an, wenn der Wert gesetzt ist
-    if ($cols !== null) $classes .= " row-cols-$cols";
-    if ($sm !== null)   $classes .= " row-cols-sm-$sm";
-    if ($md !== null)   $classes .= " row-cols-md-$md";
-    if ($lg !== null)   $classes .= " row-cols-lg-$lg";
-    if ($xl !== null)   $classes .= " row-cols-xl-$xl";
-    if ($xxl !== null)  $classes .= " row-cols-xxl-$xxl";
 @endphp
 
-<div {{ $attributes->merge(['class' => $classes]) }} {{ $attributes }}>
+<div {{ $attributes->class($field->getClasses()) }}>
     {{ $slot }}
 </div>

@@ -7,30 +7,26 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
-    $id = $attributes->get('id', 'btn-' . uniqid());
-    $classes = 'btn';
-    if($variant){
-        $classes .= ' btn-' . $variant;
-    }
 
-    if($size) $classes .= ' btn-' . $size;
+    $field = BootstrapUi::make();
+    $id = $attributes->getOrCreateId('btn-');
+
+    $field->addClass('btn')
+          ->addClassWhen($variant, 'btn-' . $variant)
+          ->addClassWhen($size, 'btn-' . $size);
 
     // Falls Attribut vorhanden, entsprechend nehmen
-    $lightIcon = $attributes->get('icon:light', $lightIcon) ;
-    $darkIcon = $attributes->get('icon:dark', $darkIcon);
+    $lightIcon = Icon::toClass($attributes->pluck('icon:light', $lightIcon));
+    $darkIcon = Icon::toClass($attributes->pluck('icon:dark', $darkIcon));
 
-    $lightIcon = Icon::toClass($lightIcon);
-    $darkIcon = Icon::toClass($darkIcon);
-
-    // WICHTIG: Die Custom-Attribute entfernen, damit sie nicht im HTML landen
-    $cleanAttributes = $attributes->except(['icon:light', 'icon:dark']);
 @endphp
 
 <button
     id="{{ $id }}"
     type="button"
-    {{ $cleanAttributes->merge(['class' => $classes]) }}
+    {{ $attributes->class($field->getClasses()) }}
     x-data="{
         theme: document.documentElement.getAttribute('data-bs-theme') || 'light'
     }"
@@ -39,12 +35,12 @@
     "
 >
     {{-- Light Icon --}}
-    <i class="{{ $lightIcon }}" x-show="theme === 'light'"></i>
+    <x-bs::icon :name="$lightIcon" x-show="theme === 'light'" />
 
     {{-- Dark Icon --}}
-    <i class="{{ $darkIcon }}" x-show="theme === 'dark'" style="display: none;"></i>
+    <x-bs::icon :name="$darkIcon" x-show="theme === 'dark'" style="display: none;"/>
 
     @if(!$slot->isEmpty())
-        <span class="ms-1">{{ $slot }}</span>
+        <x-bs::text span class="ms-1">{{ $slot }}</x-bs::text>
     @endif
 </button>

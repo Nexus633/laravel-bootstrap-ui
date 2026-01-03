@@ -7,11 +7,9 @@
 ])
 
 @php
-    $iconFinished = $attributes->get('icon:finished', $iconFinished);
-    $iconNext = $attributes->get('icon:next', $iconNext);
-    $iconLast = $attributes->get('icon:last', $iconLast);
-
-    $attributes = $attributes->except(['icon:finished', 'icon:next', 'icon:last']);
+    $iconFinished = $attributes->pluck('icon:finished', $iconFinished);
+    $iconNext = $attributes->pluck('icon:next', $iconNext);
+    $iconLast = $attributes->pluck('icon:last', $iconLast);
 @endphp
 
 <div class="d-flex justify-content-between align-items-center mt-3">

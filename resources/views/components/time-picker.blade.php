@@ -1,5 +1,5 @@
 @props([
-    'name',
+    'name' => null,
     'label' => null,
     'labelStart' => null,
     'labelEnd' => null,
@@ -17,33 +17,34 @@
 ])
 
 @php
-    $id = $attributes->get('id', 'timepicker-' . uniqid());
-    $wireModel = $attributes->wire('model');
-    $pickerId = 'tp-' . md5($name . $id);
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    // Config vorbereiten
+    $field = BootstrapUi::make($name);
+    $id = $attributes->getOrCreateId('timepicker-');
+    $hasError = $field->hasError();
+
+    $wireModel = $attributes->wire('model');
+    $pickerId = 'tp-' . md5(($name ?? 'tp') . $id);
+
     $entangleStr = $wireModel->value() ? "\$wire.entangle('{$wireModel->value()}').live" : 'null';
     $mode = $range ? 'range' : 'single';
     $disableJson = json_encode($disable);
 
-    // Icons
-    $iconPrepend = $attributes->get('icon:prepend', $icon);
+    $iconPrepend = $attributes->pluck('icon:prepend', $icon);
     if ($iconPrepend === 'false' || $iconPrepend === false) $iconPrepend = null;
-    $iconAppend = $attributes->get('icon:append');
-    $separator = $attributes->get('icon:separator') ?? $iconSeparator;
+    $iconAppend = $attributes->pluck('icon:append');
+    $separator = $attributes->pluck('icon:separator', $iconSeparator);
+    $iconPrependStart = $attributes->pluck('icon:prepend:start', $icon);
+    $iconAppendStart = $attributes->pluck('icon:append:start');
+    $iconPrependEnd = $attributes->pluck('icon:prepend:end', $icon);
+    $iconAppendEnd = $attributes->pluck('icon:append:end');
 
-    $iconPrependStart = $attributes->get('icon:prepend:start', $icon);
-    $iconAppendStart = $attributes->get('icon:append:start');
-
-    $iconPrependEnd = $attributes->get('icon:prepend:end', $icon);
-    $iconAppendEnd = $attributes->get('icon:append:end');
-
-    $attributes = $attributes->except(['icon:prepend', 'icon:append', 'icon:prepend:start', 'icon:append:start', 'icon:prepend:end', 'icon:append:end', 'icon:separator'])
+    if ($hasError) {
+        $attributes = $attributes->merge(['class' => 'is-invalid']);
+    }
 @endphp
 
 <x-bs::input.wrapper :label="$label" :id="$id" :name="$name" :hint="$hint">
-
-    {{-- Root Element mit Alpine --}}
     <div
         class="position-relative"
         id="{{ $pickerId }}"
@@ -58,7 +59,6 @@
         })"
         @click.outside="close()"
     >
-        {{-- 1. Inputs Rendering (Ausgelagert) --}}
         <x-bs::time-picker.inputs
             :id="$id"
             :name="$name"
@@ -77,10 +77,10 @@
             {{ $attributes }}
         />
 
-        {{-- 2. Hidden Input (Form Support) --}}
-        <x-bs::input type="hidden" name="{{ $name }}" value="JSON.stringify(value)" />
+        @if($name)
+            <x-bs::input type="hidden" :name="$name" x-bind:value="JSON.stringify(value)" />
+        @endif
 
-        {{-- 3. Popup Dialog (Ausgelagert) --}}
         <x-bs::time-picker.dialog />
     </div>
 </x-bs::input.wrapper>

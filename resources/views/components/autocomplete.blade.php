@@ -1,4 +1,5 @@
 @props([
+    'name' => null,
     'results' => [],
     'label' => null,
     'placeholder' => '',
@@ -11,8 +12,12 @@
 ])
 
 @php
-    $id = $attributes->get('id', 'auto_' . uniqid());
-    $name = $attributes->get('name', 'auto_' . uniqid());
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $field = BootstrapUi::make();
+
+    $id = $attributes->getOrCreateId('auto-');
+
     $hasResults = count($results) > 0;
     $hasSlot = !$slot->isEmpty();
 
@@ -27,6 +32,12 @@
     } else {
         $dynamicAttributes['x-model'] = 'searchTerm';
     }
+
+    $field->addStyle('position', 'absolute')
+          ->addStyle('width', '100%')
+          ->addStyle('top', '100%')
+          ->addStyle('left', '0')
+          ->addStyle('max-height', '200px');
 @endphp
 
 <div
@@ -68,7 +79,7 @@
             x-show="isOpen"
             x-transition
             class="dropdown-menu show mt-1 shadow-sm overflow-auto"
-            style="position: absolute; z-index: 9999; width: 100%; top: 100%; left: 0; max-height: 200px;"
+            style="{{ $field->getStyles() }}"
             x-ref="livewireDropdown"
             wire:ignore.self
         >
@@ -108,7 +119,7 @@
             x-show="isOpen && filteredCount > 0"
             x-transition
             class="dropdown-menu show mt-1 shadow-sm overflow-auto"
-            style="position: absolute; z-index: 9999; width: 100%; top: 100%; left: 0; max-height: 200px;"
+            style="{{ $field->getStyles() }}"
         >
             <ul class="list-unstyled mb-0" x-ref="staticItems">
                 {{ $slot }}

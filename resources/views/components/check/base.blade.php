@@ -1,67 +1,56 @@
 @props([
-    'name',
+    'name' => null,
     'label' => null,
-    'type' => 'checkbox',  // 'checkbox' oder 'radio'
+    'type' => 'checkbox',
     'value' => 1,
     'checked' => false,
     'inline' => false,
-    'switch' => false,     // Kürzer als isSwitch
+    'switch' => false,
     'hint' => null,
     'id' => null,
 ])
 
 @php
-    $id = $id ?? 'check-' . uniqid();
-    $hasError = $name && $errors->has($name);
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    // 1. Wrapper Klassen (Array Logik)
-    $wrapperClasses = [
-        'form-check',
-        $switch ? 'form-switch' : null,
-        $inline ? 'form-check-inline' : null,
-        !$inline ? 'mb-3' : null, // Abstand nur, wenn nicht inline
-        // Wenn Inline, setzen wir min-height, damit es sauber ausrichtet
-        $inline ? 'd-inline-flex align-items-center' : null
-    ];
+    $field = BootstrapUi::make($name);
 
-    // 2. Input Klassen
-    $inputClasses = [
-        'form-check-input',
-        $hasError ? 'is-invalid' : null,
-    ];
+    $id = $attributes->getOrCreateId('check-');
+    $hasError = $field->hasError();
 
-    // 3. Arrays zu Strings wandeln
-    $wrapperClassString = implode(' ', array_filter($wrapperClasses));
-    $inputClassString   = implode(' ', array_filter($inputClasses));
+    $field->addClass('form-check')
+          ->addClassWhen($switch, 'form-switch')
+          ->addClassWhen($inline, 'form-check-inline')
+          ->addClassWhen(!$inline, 'mb-3')
+          ->addClassWhen($inline, ['d-inline-flex', 'align-items-center']);
+
+    // Input Klassen werden jetzt mit dem Helper gebaut
+    $inputField = BootstrapUi::make(null); // Eine separate Instanz nur für die Input-Klassen
+    $inputField->addClass('form-check-input')
+               ->addClassWhen($hasError, 'is-invalid')
+               ->addDataWhen($switch, 'role', 'switch')
+               ->addDataWhen($checked, 'checked', 'checked')
+               ->addDataWhen($name, 'name', $name)
+               ;
 @endphp
 
-<div class="{{ $wrapperClassString }}">
+<div class="{{ $field->getClasses() }}">
     <input
-            type="{{ $type }}"
-            name="{{ $name }}"
-            id="{{ $id }}"
-            value="{{ $value }}"
-
-            {{-- Merge Input Klassen --}}
-            {{ $attributes->class($inputClassString) }}
-
-            {{-- Switch Rolle für Accessibility --}}
-            @if($switch) role="switch" @endif
-
-            {{-- Standard HTML Checked state (Livewire ignoriert das, wenn wire:model da ist) --}}
-            @if($checked) checked @endif
+        type="{{ $type }}"
+        id="{{ $id }}"
+        value="{{ $value }}"
+        {{ $attributes->class($inputField->getClasses())->merge($inputField->getDataAttributes()) }}
     />
 
     @if($label)
-        <label class="form-check-label" for="{{ $id }}">
+        <x-bs::text label for="{{ $id }}" class="form-check-label">
             {{ $label }}
-        </label>
+        </x-bs::text>
     @endif
 
-    {{-- Error & Hint MÜSSEN innerhalb von form-check stehen --}}
     @if($hasError)
-        <div class="invalid-feedback">{{ $errors->first($name) }}</div>
+        <x-bs::text div class="invalid-feedback">{{ $errors->first($name) }}</x-bs::text>
     @elseif($hint)
-        <div class="form-text">{{ $hint }}</div>
+        <x-bs::text div class="form-text">{{ $hint }}</x-bs::text>
     @endif
 </div>

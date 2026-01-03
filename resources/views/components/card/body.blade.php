@@ -7,7 +7,7 @@
 
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
-    $iconClass = Icon::toClass($icon);
+    $icon = Icon::toClass($icon);
 @endphp
 
 <div {{ $attributes->class(['card-body']) }}>
@@ -15,7 +15,7 @@
     {{-- Titel --}}
     @if($title)
         <h5 class="card-title">
-            @if($iconClass) <i class="{{ $iconClass }} me-1"></i> @endif
+            @if($icon) <x-bs::icon :name="$icon" class="me-1" /> @endif
             {{ $title }}
         </h5>
     @endif

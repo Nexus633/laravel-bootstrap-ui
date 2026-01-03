@@ -5,8 +5,7 @@
 @php
     // Wir generieren eine zufällige ID für DIESE Instanz.
     // Das ist wichtig, damit das CSS nicht andere Timelines auf der Seite zerschießt.
-    $uuid = 'timeline-' . \Illuminate\Support\Str::random(8);
-    $cutoff = (int) $cutoff;
+    $uuid = $attributes->getOrCreateId('timeline-');
 @endphp
 
 <div

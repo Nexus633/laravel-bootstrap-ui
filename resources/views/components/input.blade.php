@@ -1,5 +1,5 @@
 @props([
-    'name',
+    'name' => null,
     'label' => null,
     'type' => 'text',
     'multiple' => false,
@@ -7,93 +7,75 @@
     'prepend' => null,
     'append' => null,
     'size' => null,
-    'simple' => false, // true = Nur <input> Tag ohne alles
+    'simple' => false,
+    'disabled' => null,
+    'readonly' => null,
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
 
-    $id = $attributes->get('id', 'input-' . uniqid());
+    $field = BootstrapUi::make($name);
 
-    // Floating Logic extrahieren
-    $isFloating = filter_var($attributes->get('label:floating'), FILTER_VALIDATE_BOOLEAN);
-    $attributes = $attributes->except(['label:floating']);
+    $isFloating = $attributes->pluck('label:floating');
+    $iconPrepend = Icon::toClass($attributes->pluck('icon:prepend'));
+    $iconAppend = Icon::toClass($attributes->pluck('icon:append'));
 
-    // Error Check
-    $hasError = $name && $errors->has($name);
+    $id = $attributes->getOrCreateId('input-');
+    $hasError = $field->hasError();
 
-    // Basis Klassen für den <input> Tag
-    $inputClasses = ['form-control'];
-    if ($hasError) $inputClasses[] = 'is-invalid';
-    if ($size)     $inputClasses[] = 'form-control-' . $size;
+    $field->addClass('form-control')
+          ->addClassWhen($hasError, 'is-invalid')
+          ->addClassWhen($size, 'form-control-' . $size);
 
-    // Icons auflösen
-    $iconPrepend = Icon::toClass($attributes->get('icon:prepend'));
-    $iconAppend  = Icon::toClass($attributes->get('icon:append'));
-    $attributes = $attributes->except(['icon:prepend', 'icon:append']);
-
-    // Check: Brauchen wir eine Input-Group?
     $hasGroup = ($prepend || $append || $iconPrepend || $iconAppend);
 
-    if($multiple && $type !== 'file'){
+    if ($multiple && $type !== 'file') {
         $multiple = false;
     }
-
 @endphp
 
 @if($simple)
-    {{-- RAW MODE: Nur der Tag (für Nutzung IN Gruppen) --}}
     <input
         id="{{ $id }}"
         type="{{ $type }}"
-        name="{{ $name }}"
+        @if($name) name="{{ $name }}" @endif
         @if($multiple) multiple @endif
-        {{ $attributes->class($inputClasses) }}
+        {{ $attributes->class($field->getClasses()) }}
     />
 @else
-    {{-- WRAPPER MODE: Standard Nutzung --}}
     <x-bs::input.wrapper :label="$label" :id="$id" :name="$name" :hint="$hint" :floating="$isFloating">
-
         @if($hasGroup)
-            {{-- OPTION A: INPUT GROUP --}}
             <x-bs::input.group :size="$size">
-
-                {{-- Prepend --}}
                 @if($prepend || $iconPrepend)
                     <x-bs::input-group.text>
-                         @if($iconPrepend) <x-bs::icon :name="$iconPrepend" /> @else {!! $prepend !!} @endif
+                        @if($iconPrepend) <x-bs::icon :name="$iconPrepend" /> @else {!! $prepend !!} @endif
                     </x-bs::input-group.text>
                 @endif
 
-                {{-- Input (ggf. Floating inside Group) --}}
                 @if($isFloating)
                     <div class="form-floating {{ $hasError ? 'is-invalid' : '' }}">
-                        <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" placeholder="{{ $label }}" {{ $attributes->class($inputClasses) }} />
+                        <input id="{{ $id }}" type="{{ $type }}" @if($name) name="{{ $name }}" @endif placeholder="{{ $label }}" {{ $attributes->class($field->getClasses()) }} />
                         <x-bs::text label for="{{ $id }}">{{ $label }}</x-bs::text>
                     </div>
                 @else
-                    <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" {{ $attributes->class($inputClasses) }} />
+                    <input id="{{ $id }}" type="{{ $type }}" @if($name) name="{{ $name }}" @endif {{ $attributes->class($field->getClasses()) }} />
                 @endif
 
-                {{-- Append --}}
                 @if($append || $iconAppend)
                     <x-bs::input-group.text>
                         @if($iconAppend) <x-bs::icon :name="$iconAppend" /> @else {!! $append !!} @endif
                     </x-bs::input-group.text>
                 @endif
             </x-bs::input.group>
-
         @elseif($isFloating)
-            {{-- OPTION B: PURE FLOATING --}}
             <div class="form-floating {{ $hasError ? 'is-invalid' : '' }}">
-                <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" placeholder="{{ $label }}" {{ $attributes->class($inputClasses) }} />
+                <input id="{{ $id }}" type="{{ $type }}" @if($name) name="{{ $name }}" @endif placeholder="{{ $label }}" {{ $attributes->class($field->getClasses()) }} />
                 <x-bs::text label for="{{ $id }}">{{ $label }}</x-bs::text>
             </div>
-
         @else
-            {{-- OPTION C: STANDARD INPUT --}}
-            <input id="{{ $id }}" type="{{ $type }}" @if($multiple) multiple @endif name="{{ $name }}" {{ $attributes->class($inputClasses) }} />
+            <input id="{{ $id }}" type="{{ $type }}" @if($name) name="{{ $name }}" @endif {{ $attributes->class($field->getClasses()) }} />
         @endif
-
     </x-bs::input.wrapper>
 @endif

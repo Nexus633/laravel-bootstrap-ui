@@ -10,37 +10,31 @@
 ])
 
 @php
-    $vAlign = $attributes->get('align:vertical', $vAlign);
-    $attributes = $attributes->except('align:vertical');
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
 
-    $classes = [];
+    $vAlign = $attributes->pluck('align:vertical', $vAlign);
+
 
     $hasSize = $size || $sm || $md || $lg || $xl || $xxl;
 
     if (!$hasSize) {
-        $classes[] = 'col';
+        $field->addClass('col');
     } else {
-        if ($size !== null) $classes[] = "col-$size";
-        if ($sm !== null)   $classes[] = "col-sm-$sm";
-        if ($md !== null)   $classes[] = "col-md-$md";
-        if ($lg !== null)   $classes[] = "col-lg-$lg";
-        if ($xl !== null)   $classes[] = "col-xl-$xl";
-        if ($xxl !== null)  $classes[] = "col-xxl-$xxl";
+        $field->addClassWhen($size, 'col-' . $size)
+              ->addClassWhen($sm, 'col-sm-' . $sm)
+              ->addClassWhen($md, 'col-md-' . $md)
+              ->addClassWhen($lg, 'col-lg-' . $lg)
+              ->addClassWhen($xl, 'col-xl-' . $xl)
+              ->addClassWhen($xxl, 'col-xxl-' . $xxl);
     }
 
-    // Neu: Order Logik
-    if ($order !== null) {
-        // Erlaubt: order="1", order="first", order="last"
-        $classes[] = "order-$order";
-    }
-
+    // Erlaubt: order="1", order="first", order="last"
     // Align Self (Vertikal für DIESE Column)
-    if($vAlign !== null){
-        $classes[] = 'align-self-' . $vAlign;
-    }
-
+    $field->addClassWhen($order, "order-$order")
+          ->addClassWhen($vAlign, 'align-self-' . $vAlign);
 @endphp
 
-<div {{ $attributes->class($classes) }} {{ $attributes }}>
+<div {{ $attributes->class($field->getClasses()) }}>
     {{ $slot }}
 </div>

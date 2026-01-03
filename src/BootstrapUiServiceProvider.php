@@ -5,14 +5,15 @@ namespace Nexus633\BootstrapUi;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\ComponentAttributeBag;
 use Nexus633\BootstrapUi\Services\CodeHighlighterService;
+use Nexus633\BootstrapUi\Services\CommandPaletteService;
 use Nexus633\BootstrapUi\Services\FlashService;
 use Nexus633\BootstrapUi\Services\IconService;
 use Nexus633\BootstrapUi\Services\ModalService;
 use Nexus633\BootstrapUi\Services\ThemeService;
 use Nexus633\BootstrapUi\Services\ToastService;
 use Nexus633\BootstrapUi\Services\TreeViewService;
-use Nexus633\BootstrapUi\View\Components\CodeBlock;
 
 class BootstrapUiServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,7 @@ class BootstrapUiServiceProvider extends ServiceProvider
 
         $this->bootRoutes();
         $this->bootBladeDirective();
+        $this->bootMacros();
 
         if ($this->app->runningInConsole()) {
             $this->bootPublishes();
@@ -39,6 +41,23 @@ class BootstrapUiServiceProvider extends ServiceProvider
 
         $this->registerSingleton();
 
+    }
+
+    private function bootMacros(): void
+    {
+        ComponentAttributeBag::macro('pluck', function (string $key, $default = null) {
+            $value = $this->get($key, $default);
+            unset($this->attributes[$key]);
+            return $value;
+        });
+
+        ComponentAttributeBag::macro('getOrCreateId', function (string $prefix = 'field-') {
+            return $this->get('id', $prefix . uniqid());
+        });
+
+        ComponentAttributeBag::macro('getOrCreateName', function (string $prefix = 'field-') {
+            return $this->get('name', $prefix . uniqid());
+        });
     }
 
     private function registerSingleton(): void
@@ -70,6 +89,10 @@ class BootstrapUiServiceProvider extends ServiceProvider
         $this->app->singleton('bs-code-highlighter', function () {
             return new CodeHighlighterService();
         });
+
+        $this->app->singleton('bs-command-palette', function () {
+            return new CommandPaletteService();
+        });
     }
 
     private function bootPublishes(): void
@@ -80,7 +103,7 @@ class BootstrapUiServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'/../config/bootstrap-ui.php' => config_path('bootstrap-ui.php'),
-        ], 'bootstrap-ui-config'); // Neuer Tag!
+        ], 'bootstrap-ui-config');
 
         $this->publishes([
             __DIR__.'/../resources/lang' => resource_path('lang/vendor/bs'),

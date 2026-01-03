@@ -11,11 +11,15 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Illuminate\View\ViewException;
 
     if(!$divider && !$label){
         throw new ViewException(__('bs::bootstrap-ui.context-menu.ViewException'));
     }
+
+    $field = BootstrapUi::make();
+    $field->addClass('dropdown-item', 'd-flex', 'align-items-center', 'cursor-pointer', 'w-100', 'text-start');
 
     $jsConfig = [
         'confirm'     => $confirm,
@@ -24,6 +28,8 @@
         'dispatch'    => $dispatch,
         'params'      => $params
     ];
+
+    $iconVariant = $danger ? 'danger' : null;
 @endphp
 
 @if($divider)
@@ -31,16 +37,16 @@
 @else
     <x-bs::link
         href="#"
-        class="dropdown-item d-flex align-items-center cursor-pointer w-100 text-start"
+        {{ $attributes->class($field->getClasses()) }}
         x-data="bsContextMenuItem({{ json_encode($jsConfig) }})"
         @click.prevent="execute()"
         :no-underline="true"
         :variant="null"
     >
         @if($icon)
-            <x-bs::icon name="{{ $icon }}" :variant="$danger ? 'danger' : null" class="me-2"/>
+            <x-bs::icon name="{{ $icon }}" :variant="$iconVariant" class="me-2"/>
         @endif
-        <x-bs::text span :variant="$danger ? 'danger' : null">
+        <x-bs::text span :variant="$iconVariant">
             {{ $label }}
         </x-bs::text>
     </x-bs::link>

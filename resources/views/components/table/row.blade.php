@@ -1,5 +1,13 @@
-@props(['variant' => null])
+@props([
+    'variant' => null
+])
+@php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+    $field->addClassWhen($variant, 'table-' . $variant);
 
-<tr  {{ $attributes->merge(['class' => $variant ? 'table-' . $variant : null]) }}>
+@endphp
+
+<tr  {{ $attributes->merge(['class' => $field->getClasses()]) }}>
     {{ $slot }}
 </tr>

@@ -5,14 +5,15 @@
 ])
 
 @php
-    $classes = [
-        'collapse',
-        'collapse-horizontal' => $horizontal,
-        'show' => $show
-    ];
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+
+    $field->addClass('collapse')
+          ->addClassWhen($horizontal, 'collapse-horizontal')
+          ->addClassWhen($show, 'show');
 @endphp
 
-<div id="{{ $id }}" {{ $attributes->except('id')->class($classes) }}>
+<div id="{{ $id }}" {{ $attributes->class($field->getClasses()) }}>
     {{-- 
         Bei horizontalem Collapse benötigt Bootstrap einen inneren Container 
         mit fester Breite (width), damit die Animation flüssig ist.

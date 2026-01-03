@@ -8,13 +8,17 @@
 ])
 
 @php
-    $classes = 'w-100';
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
 
-    if ($sm !== null)   $classes .= " d-none d-sm-block";
-    if ($md !== null)   $classes .= " d-none d-md-block";
-    if ($lg !== null)   $classes .= " d-none d-lg-block";
-    if ($xl !== null)   $classes .= " d-none d-xl-block";
-    if ($xxl !== null)  $classes .= " d-none d-xxl-block";
+    $hasSize = $sm || $md || $lg || $xl || $xxl;
+    $field->addClass('w-100')
+          ->addClassWhen($hasSize, 'd-none')
+          ->addClassWhen($sm, 'd-sm-block')
+          ->addClassWhen($md, 'd-md-block')
+          ->addClassWhen($lg, 'd-lg-block')
+          ->addClassWhen($xl, 'd-xl-block')
+          ->addClassWhen($xxl, 'd-xxl-block');
 @endphp
 
-<div {{ $attributes->merge(['class' => $classes]) }}></div>
+<div {{ $attributes->class($field->getClasses()) }}></div>

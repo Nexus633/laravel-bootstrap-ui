@@ -1,23 +1,24 @@
 @props([
-    'title' => null,     // Die Überschrift (fett)
-    'content',           // Der eigentliche Text
+    'title' => null,
+    'content',
     'placement' => config('bootstrap-ui.popover.position', 'right'),
     'customClass' => config('bootstrap-ui.popover.custom_class', ''),
 ])
 
 @php
-    // Deine Boolean-Flag Logik (Wiederverwendet)
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+
+    // Placement logic
     $acceptPlacement = ['top', 'bottom', 'left', 'right'];
     if(!in_array($placement, $acceptPlacement)){
         $placement = config('bootstrap-ui.popover.position', 'right');
     }
 
-    $top = $attributes->get('top');
-    $bottom = $attributes->get('bottom');
-    $left = $attributes->get('left');
-    $right = $attributes->get('right');
-
-    $attributes = $attributes->except(['top', 'bottom', 'left', 'right']);
+    $top = $attributes->pluck('top');
+    $bottom = $attributes->pluck('bottom');
+    $left = $attributes->pluck('left');
+    $right = $attributes->pluck('right');
 
     if($top) $placement = 'top';
     if($bottom) $placement = 'bottom';
@@ -25,37 +26,22 @@
     if($right) $placement = 'right';
 
     $disabled = $attributes->get('disabled');
-    $triggerByDisabled = '';
 
-
-    if($disabled){
-        $triggerByDisabled = 'data-bs-trigger="hover focus"';
-    }
+    // Build attributes using the helper
+    $field->addData('data-bs-container', 'body')
+          ->addData('data-bs-placement', $placement)
+          ->addData('data-bs-content', $content)
+          ->addData('role', 'button')
+          ->addData('tabindex', '0')
+          ->addDataWhen($title, 'data-bs-title', $title)
+          ->addDataWhen($customClass, 'data-bs-custom-class', $customClass)
+          ->addDataWhen($disabled, 'data-bs-trigger', 'hover focus')
+          ->addClass('d-inline-block', 'cursor-pointer');
 @endphp
 
 <span
-    {{-- Initialisierung via Alpine --}}
     x-bs-popover
-
-    {{-- Bootstrap Data Attributes --}}
-    data-bs-container="body"
-    data-bs-placement="{{ $placement }}"
-    data-bs-content="{{ $content }}"
-    {!! $triggerByDisabled !!}
-    {{-- Titel ist optional beim Popover --}}
-    @if($title) data-bs-title="{{ $title }}" @endif
-
-    {{-- Custom Class --}}
-    @if($customClass) data-bs-custom-class="{{ $customClass }}" @endif
-
-    {{--
-        tabindex="0" ist PFLICHT für trigger="focus" bei nicht-interaktiven Elementen (span/div).
-        role="button" ist gut für Barrierefreiheit.
-    --}}
-    tabindex="0"
-    role="button"
-
-    {{ $attributes->merge(['class' => 'd-inline-block cursor-pointer']) }}
+    {{ $attributes->merge($field->getDataAttributes())->class($field->getClasses()) }}
 >
     {{ $slot }}
 </span>

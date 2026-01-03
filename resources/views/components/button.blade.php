@@ -16,19 +16,19 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
+    
+    $field = BootstrapUi::make();
 
-    // Validierung: Collapse und Offcanvas schließen sich aus
+    // --- LOGIC ---
     if ($collapse && $offcanvas) {
         throw new InvalidArgumentException(__('bs::bootstrap-ui.button.InvalidArgumentException'));
     }
 
-    // Icon prepend/append aus Attributes holen und entfernen
-    $iconPrepend = $attributes->get('icon:prepend');
-    $iconAppend = $attributes->get('icon:append');
-    $attributes = $attributes->except(['icon:prepend', 'icon:append']);
+    $iconPrepend = $attributes->pluck('icon:prepend');
+    $iconAppend = $attributes->pluck('icon:append');
 
-    $id = $attributes->get('id');
     $cleanIcon = $icon ? Icon::toClass($icon) : null;
     $cleanIconPrepend = $iconPrepend ? Icon::toClass($iconPrepend) : null;
     $cleanIconAppend = $iconAppend ? Icon::toClass($iconAppend) : null;
@@ -36,90 +36,57 @@
     $isLink = $attributes->has('href');
     $tag = $isLink ? 'a' : 'button';
 
-    // Klassen-Array basiert aufbauen
-    $classes = [];
-
+    // --- CLASSES ---
     if ($pagination) {
-        // Bei Pagination nur page-link, keine btn-Klassen
-        $classes[] = 'page-link';
-        if ($disabled) $classes[] = 'disabled';
+        $field->addClass('page-link')->addClassWhen($disabled, 'disabled');
     } else {
-        // Normale Button-Klassen
-        $actualVariant = $outline && !str_contains($variant, 'outline')
-            ? 'outline-' . $variant
-            : $variant;
-
-        $classes[] = 'btn';
-        $classes[] = 'btn-' . $actualVariant;
-
-        if ($size) $classes[] = 'btn-' . $size;
-        if ($relative) $classes[] = 'position-relative';
-
-        // Alignment
-        if ($align === 'right') $classes[] = 'float-end';
-        elseif ($align === 'block') $classes[] = 'w-100 d-block';
-        elseif ($align === 'center') $classes[] = 'd-block mx-auto';
+        $actualVariant = $outline && !str_contains($variant, 'outline') ? 'outline-' . $variant : $variant;
+        $field->addClass('btn', 'btn-' . $actualVariant)
+              ->addClassWhen($size, 'btn-' . $size)
+              ->addClassWhen($relative, 'position-relative')
+              ->addClassWhen($align === 'right', 'float-end')
+              ->addClassWhen($align === 'block', ['w-100', 'd-block'])
+              ->addClassWhen($align === 'center', ['d-block', 'mx-auto']);
     }
 
-    $classString = implode(' ', array_filter($classes));
-
-    // Bootstrap Toggle Attribute
-    $extraAttrs = [];
-
+    // --- ATTRIBUTES ---
     if ($collapse) {
-        $extraAttrs['data-bs-toggle'] = 'collapse';
-        $target = (str_starts_with($collapse, '.') || str_starts_with($collapse, '#'))
-            ? $collapse
-            : '#' . $collapse;
-        $extraAttrs['data-bs-target'] = $target;
-        $extraAttrs['aria-expanded'] = 'false';
-        $extraAttrs['aria-controls'] = trim($target, '#.');
-
-        if ($isLink && !$attributes->has('href')) {
-            $extraAttrs['href'] = $target;
-        }
+        $target = (str_starts_with($collapse, '.') || str_starts_with($collapse, '#')) ? $collapse : '#' . $collapse;
+        $field->addData('data-bs-toggle', 'collapse')
+              ->addData('data-bs-target', $target)
+              ->addData('aria-expanded', 'false')
+              ->addData('aria-controls', trim($target, '#.'))
+              ->addDataWhen($isLink && !$attributes->has('href'), 'href', $target);
     }
-
     if ($offcanvas) {
-        $extraAttrs['data-bs-toggle'] = 'offcanvas';
         $target = str_starts_with($offcanvas, '#') ? $offcanvas : '#' . $offcanvas;
-        $extraAttrs['data-bs-target'] = $target;
-        $extraAttrs['aria-controls'] = trim($target, '#');
-
-        if ($isLink && !$attributes->has('href')) {
-            $extraAttrs['href'] = $target;
-        }
+        $field->addData('data-bs-toggle', 'offcanvas')
+              ->addData('data-bs-target', $target)
+              ->addData('aria-controls', trim($target, '#.'))
+              ->addDataWhen($isLink && !$attributes->has('href'), 'href', $target);
     }
 
     if ($dismiss) {
-        $extraAttrs['data-bs-dismiss'] = $dismiss;
-        $extraAttrs['aria-label'] = $ariaLabel ?? 'Close';
+        $field->addData('data-bs-dismiss', $dismiss);
+    }
+    if (($dismiss || $collapse || $offcanvas) && $slot->isEmpty()) {
+        $field->addData('aria-label', $ariaLabel ?? ($dismiss ? 'Close' : 'Toggle'));
     }
 
-    // Disabled-State
     if ($disabled) {
-        if ($isLink) {
-            $extraAttrs['aria-disabled'] = 'true';
-            $extraAttrs['tabindex'] = '-1';
-        } else {
-            $extraAttrs['disabled'] = true;
-        }
+        $field->addDataWhen($isLink, 'aria-disabled', 'true')
+              ->addDataWhen($isLink, 'tabindex', '-1')
+              ->addDataWhen(!$isLink, 'disabled', true);
     }
 
-    // Aria-Label für Toggle-Buttons ohne Text
-    if (($collapse || $offcanvas) && $slot->isEmpty() && !isset($extraAttrs['aria-label'])) {
-        $extraAttrs['aria-label'] = $ariaLabel ?? 'Toggle';
-    }
-
-    // Icon-Priorität: prepend/append überschreiben das alte icon-Prop
+    // --- ICONS ---
     $hasIconPrepend = $cleanIconPrepend || ($cleanIcon && !$iconAppend);
     $hasIconAppend = $cleanIconAppend || ($cleanIcon && !$iconPrepend && $iconAppend);
 @endphp
 
 <{{ $tag }}
-    @if($id) id="{{ $id }}" @endif
-    @if(!$isLink) type="{{ $type }}" @endif
-    {{ $attributes->merge($extraAttrs)->merge(['class' => $classString]) }}
+    @if($tag !== 'a') type="{{ $type }}" @endif
+    {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}
     @if($loading)
         wire:loading.attr="disabled"
         wire:loading.class="pe-none"
@@ -132,17 +99,13 @@
         </span>
     @endif
 
-    @if(!$loading && $cleanIconPrepend)
-        <x-bs::icon :name="$cleanIconPrepend" class="me-1" />
-    @elseif(!$loading && $cleanIcon && !$iconAppend)
-        <x-bs::icon :name="$cleanIcon" class="me-1" />
+    @if(!$loading && $hasIconPrepend)
+        <x-bs::icon :name="$cleanIconPrepend ?: $cleanIcon" class="me-1" />
     @endif
 
     {{ $slot }}
 
-    @if(!$loading && $cleanIconAppend)
-        <x-bs::icon :name="$cleanIconAppend" class="ms-1" />
-    @elseif(!$loading && $cleanIcon && $iconAppend)
-        <x-bs::icon :name="$cleanIcon" class="ms-1" />
+    @if(!$loading && $hasIconAppend)
+        <x-bs::icon :name="$cleanIconAppend ?: $cleanIcon" class="ms-1" />
     @endif
 </{{ $tag }}>

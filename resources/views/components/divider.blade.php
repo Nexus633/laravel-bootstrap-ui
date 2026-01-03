@@ -9,35 +9,28 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
 
-    $verticalBetween = $attributes->get('vertical:between', $verticalBetween);
-    $attributes = $attributes->except(['vertical:between']);
+    $verticalBetween = $attributes->pluck('vertical:between', $verticalBetween);
 
-    // 1. Text-Farbe via Bootstrap Klasse (z.B. text-danger)
-    $classes = ['text-' . $variant];
-
-    // 2. Wenn Breite gesetzt ist, zentrieren wir den Divider selbst (mx-auto)
-    if ($vertical && $verticalBetween) {
-        $classes[] = 'mx-auto';
-    }
+    $field->addClass('text-' . $variant)
+          ->addClassWhen($vertical && $verticalBetween, 'mx-auto')
+          ->addClassWhen($vertical, ['bs-divider-vertical', 'mx-2'])
+          ->addClassWhen(!$vertical, 'bs-divider')
+          ->addStyleWhen($width, 'width', $width)
+          ->addStyleWhen(!$width, '--bs-divider-width', '100%');
 @endphp
 
 @if($vertical)
     {{-- Vertikaler Divider --}}
-    <div
-            @if($width)
-                style="width: {{ $width }}"
-            @endif
-            {{ $attributes->class(array_merge(['bs-divider-vertical', 'mx-2'], $classes)) }}
-    ></div>
+    <div {{ $attributes->class($field->getClasses())->merge(['style' => $field->getStyles()]) }}></div>
 @else
     {{-- Horizontaler Divider --}}
     <div
         {{-- Breite als CSS Variable übergeben --}}
-        style="--bs-divider-width: 100%"
-        {{ $attributes->class(array_merge(['bs-divider'], $classes)) }}
+        {{ $attributes->class($field->getClasses())->merge(['style' => $field->getStyles()]) }}
     >
-
         {{-- Linie Links (Nur anzeigen, wenn nicht 'start' ausgerichtet) --}}
         @if($align !== 'start')
             <div class="bs-divider-line"></div>

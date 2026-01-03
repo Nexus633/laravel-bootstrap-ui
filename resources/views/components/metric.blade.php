@@ -10,6 +10,9 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    use Nexus633\BootstrapUi\Facades\Icon;
+
     // 1. Semantische Trend-Farbe bestimmen (Unabhängig vom Rest)
     $trendColor = match ($trend) {
         'up' => 'success',
@@ -28,29 +31,36 @@
     // 2. Ist die Karte farbig?
     $isCardColored = !empty($bg);
 
+    // BootstrapUi Instanzen
+    $labelUi = BootstrapUi::make();
+    $iconHeaderUi = BootstrapUi::make();
+    $valueUi = BootstrapUi::make();
+    $trendTextUi = BootstrapUi::make();
+    $subTextUi = BootstrapUi::make();
+
     // 3. Icon oben rechts stylen
-    // Farbiges BG -> Icon Weiß Transparent
-    // Weißes BG -> Icon in Variant-Farbe (z.B. Blau)
-    $iconClass = $isCardColored
-        ? 'bg-white bg-opacity-25 text-white'
-        : 'bg-'.$variant.'-subtle text-'.$variant;
+    $iconHeaderUi->addClass('d-flex', 'align-items-center', 'justify-content-center', 'rounded-3');
+    $iconHeaderUi->addStyle('width', '36px')->addStyle('height', '36px');
+    $iconHeaderUi->addClassWhen($isCardColored, ['bg-white', 'bg-opacity-25', 'text-white'], ['bg-'.$variant.'-subtle', 'text-'.$variant]);
 
     // 4. Trend Farbe Logik (Das was du wolltest)
+    $trendTextUi->addClass('d-flex', 'align-items-center', 'fw-semibold', 'me-2');
     if ($coloredTrend) {
-        // Option AN: Immer Grün/Rot, egal welcher Hintergrund
-        // Wir fügen 'bg-white rounded px-1' hinzu (optional), falls der Kontrast auf Blau zu schlecht ist?
-        // Nein, du wolltest nur die Farbe. Ich mache es zusätzlich FETT, damit man es auf Blau lesen kann.
-        $trendTextClass = 'text-' . $trendColor . ' fw-bold';
-
-        // Falls du willst, dass das Icon auch die Farbe hat, muss es hier rein.
-        // Bootstrap Text-Klassen färben Icons automatisch mit.
+        $trendTextUi->addClass('text-' . $trendColor, 'fw-bold');
     } else {
-        // Option AUS (Standard): Weiß auf farbigem Grund, sonst Grün/Rot
-        $trendTextClass = $isCardColored ? 'text-white' : 'text-' . $trendColor;
+        $trendTextUi->addClassWhen($isCardColored, 'text-white', 'text-' . $trendColor);
     }
 
-    // Subtext (z.B. "vs Vormonat")
-    $subTextClass = $isCardColored ? 'text-white opacity-75' : 'text-body-tertiary';
+    // Label Klassen
+    $labelUi->addClass('fw-medium', 'small', 'text-uppercase', 'tracking-wide');
+    $labelUi->addClassWhen($isCardColored, ['text-white', 'opacity-75'], 'text-body-secondary');
+
+    // Value Klassen
+    $valueUi->addClass('card-title', 'fw-bold', 'mb-1');
+    $valueUi->addClassWhen($isCardColored, 'text-white', 'text-body-emphasis');
+
+    // Subtext Klassen
+    $subTextUi->addClassWhen($isCardColored, ['text-white', 'opacity-75'], 'text-body-tertiary');
 @endphp
 
 <x-bs::card
@@ -60,14 +70,13 @@
 >
     {{-- Header --}}
     <div class="d-flex align-items-center justify-content-between mb-3">
-        <span class="{{ $isCardColored ? 'text-white opacity-75' : 'text-body-secondary' }} fw-medium small text-uppercase tracking-wide">
+        <span class="{{ $labelUi->getClasses() }}">
             {{ $label }}
         </span>
 
         @if($icon)
             <div
-                class="d-flex align-items-center justify-content-center rounded-3 {{ $iconClass }}"
-                style="width: 36px; height: 36px;"
+                {{ $iconHeaderUi->getStyles() }}
             >
                 <x-bs::icon :name="$icon" size="1.1rem" />
             </div>
@@ -75,7 +84,7 @@
     </div>
 
     {{-- Value --}}
-    <h3 class="card-title fw-bold mb-1 {{ $isCardColored ? 'text-white' : 'text-body-emphasis' }}">
+    <h3 class="{{ $valueUi->getClasses() }}">
         {{ $value }}
     </h3>
 
@@ -83,7 +92,7 @@
     @if($trend || $trendValue || !$slot->isEmpty())
         <div class="d-flex align-items-center mt-2 small">
             @if($trend)
-                <span class="d-flex align-items-center fw-semibold me-2 {{ $trendTextClass }}">
+                <span class="{{ $trendTextUi->getClasses() }}">
                     @if($trendIcon)
                         <x-bs::icon :name="$trendIcon" class="me-1" size="5"/>
                     @endif
@@ -91,7 +100,7 @@
                 </span>
             @endif
 
-            <span class="{{ $subTextClass }}">
+            <span class="{{ $subTextUi->getClasses() }}">
                 {{ $slot }}
             </span>
         </div>

@@ -1,74 +1,60 @@
 @props([
-    'name',
+    'name' => null,
     'label' => null,
     'placeholder' => null,
     'hint' => null,
-    'toggle' => true, // Soll das Auge angezeigt werden?
-    'icon' => null,   // Optionales Icon ganz links (z.B. 'lock')
+    'toggle' => true,
+    'icon' => null,
     'toggleShowIcon' => 'eye-slash',
     'toggleHideIcon' => 'eye'
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
 
-    $id = $attributes->get('id', 'password-' . uniqid());
+    $field = BootstrapUi::make($name);
 
-    // Icon Logic
-    $toggleShowIcon = Icon::toClass($attributes->get('toggle:show', $toggleShowIcon));
-    $toggleHideIcon = Icon::toClass($attributes->get('toggle:hide', $toggleHideIcon));
-    $iconClass      = $icon ? Icon::toClass($icon) : null;
+    // Pluck custom attributes
+    $toggleShowIcon = Icon::toClass($attributes->pluck('toggle:show', $toggleShowIcon));
+    $toggleHideIcon = Icon::toClass($attributes->pluck('toggle:hide', $toggleHideIcon));
 
-    // Attribute bereinigen
-    $attributes = $attributes->except(['toggle:show', 'toggle:hide']);
-
-    // Error Check
-    $hasError = $name && $errors->has($name);
+    $id = $attributes->getOrCreateId('password-');
+    $hasError = $field->hasError();
+    $iconClass = $icon ? Icon::toClass($icon) : null;
+    
+    $field->addClass('form-control')
+          ->addClassWhen($hasError, 'is-invalid');
 @endphp
 
-{{-- 1. Der Wrapper kümmert sich um Label, Error und Abstände --}}
 <x-bs::input.wrapper :label="$label" :id="$id" :name="$name" :hint="$hint">
-
-    {{-- 2. Alpine Scope für diesen spezifischen Input --}}
     <div x-data="{ show: false }">
-
-        {{-- 3. Die Group hält alles zusammen --}}
-        <x-bs::input.group :hasError="$hasError">
-
-            {{-- A. Optionales Icon links --}}
+        <x-bs::input.group>
             @if($iconClass)
                 <span class="input-group-text">
                     <i class="{{ $iconClass }}"></i>
                 </span>
             @endif
 
-            {{-- B. Das eigentliche Input Feld --}}
             <input
-                    id="{{ $id }}"
-                    name="{{ $name }}"
-                    {{-- Alpine steuert den Typ --}}
-                    :type="show ? 'text' : 'password'"
-
-                    @if($placeholder) placeholder="{{ $placeholder }}" @endif
-
-                    {{-- Klassenlogik (muss hier manuell sein, da raw input) --}}
-                    {{ $attributes->class(['form-control', 'is-invalid' => $hasError]) }}
+                id="{{ $id }}"
+                @if($name) name="{{ $name }}" @endif
+                :type="show ? 'text' : 'password'"
+                @if($placeholder) placeholder="{{ $placeholder }}" @endif
+                {{ $attributes->class($field->getClasses()) }}
             />
 
-            {{-- C. Der Toggle Button (Rechts) --}}
             @if($toggle)
                 <button
-                        class="btn btn-outline-secondary"
-                        type="button"
-                        @click="show = !show"
-                        tabindex="-1" {{-- Damit man nicht versehentlich drauf tabbt --}}
-                        aria-label="Passwort anzeigen"
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    @click="show = !show"
+                    tabindex="-1"
+                    aria-label="Passwort anzeigen"
                 >
                     <i class="bi" :class="show ? '{{ $toggleShowIcon }}' : '{{ $toggleHideIcon }}'"></i>
                 </button>
             @endif
-
         </x-bs::input.group>
     </div>
-
 </x-bs::input.wrapper>

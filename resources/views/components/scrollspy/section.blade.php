@@ -5,10 +5,8 @@
 
 <div id="{{ $id }}" {{ $attributes->class(['mb-4']) }}>
     @if($heading)
-        <h4>{{ $heading }}</h4>
+        <x-bs::text h4>{{ $heading }}</x-bs::text>
     @endif
 
-    <div class="text-muted">
-        {{ $slot }}
-    </div>
+    <x-bs::text div class="text-muted">{{ $slot }}</x-bs::text>
 </div>

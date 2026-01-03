@@ -25,54 +25,50 @@
 ])
 
 @php
-    $icon = $attributes->get('icon:prepend', $icon);
-    $iconAppend = $attributes->get('icon:append', $iconAppend);
-    $attributes = $attributes->except(['icon:prepend', 'icon:append']);
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    use Nexus633\BootstrapUi\Facades\Icon; // Diese Zeile ist möglicherweise redundant, wenn Icon nicht direkt hier verwendet wird, aber schadet nicht.
 
-    $classes = [];
+    $icon = $attributes->pluck('icon:prepend', $icon);
+    $iconAppend = $attributes->pluck('icon:append', $iconAppend);
 
-    // --- FARBEN (Bootstrap link-* Klassen) ---
-    // Diese Klassen kümmern sich automatisch um Hover-States
-    if ($primary)   $classes[] = 'link-primary';
-    elseif ($secondary) $classes[] = 'link-secondary';
-    elseif ($success)   $classes[] = 'link-success';
-    elseif ($danger)    $classes[] = 'link-danger';
-    elseif ($warning)   $classes[] = 'link-warning';
-    elseif ($info)      $classes[] = 'link-info';
-    elseif ($light)     $classes[] = 'link-light';
-    elseif ($dark)      $classes[] = 'link-dark';
-    elseif ($body)      $classes[] = 'link-body-emphasis';
-    // Default: Standard Browser Link Blau (keine Klasse nötig)
+    $field = BootstrapUi::make();
+
+    // --- FARBEN ---
+    $colorClass = null;
+    if ($primary)   $colorClass = 'link-primary';
+    elseif ($secondary) $colorClass = 'link-secondary';
+    elseif ($success)   $colorClass = 'link-success';
+    elseif ($danger)    $colorClass = 'link-danger';
+    elseif ($warning)   $colorClass = 'link-warning';
+    elseif ($info)      $colorClass = 'link-info';
+    elseif ($light)     $colorClass = 'link-light';
+    elseif ($dark)      $colorClass = 'link-dark';
+    elseif ($body)      $colorClass = 'link-body-emphasis';
+
+    $field->addClassWhen($colorClass, $colorClass);
 
     // --- TYPOGRAFIE ---
-    if ($bold)   $classes[] = 'fw-bold';
-    if ($small)  $classes[] = 'small';
-    if ($italic) $classes[] = 'fst-italic';
+    $field->addClassWhen($bold, 'fw-bold')
+          ->addClassWhen($small, 'small')
+          ->addClassWhen($italic, 'fst-italic');
 
     // --- DEKORATION ---
     if ($noUnderline) {
-        $classes[] = 'text-decoration-none';
+        $field->addClass('text-decoration-none');
     } elseif ($underline) {
-        $classes[] = 'text-decoration-underline';
+        $field->addClass('text-decoration-underline');
     } else {
-        // Standard: Bootstrap unterstreicht meist bei Hover.
-        // offset sorgt für besseren Lesbarkeits-Abstand
-        if ($offset) $classes[] = 'link-offset-2'; 
+        $field->addClassWhen($offset, 'link-offset-2');
     }
 
     // --- UTILITIES ---
-    if ($stretched) $classes[] = 'stretched-link';
+    $field->addClassWhen($stretched, 'stretched-link')
+          ->addDataWhen($target, 'target', $target)
+          ->addDataWhen(($target === '_blank'), 'rel', 'noopener noreferrer');
 
-    // --- TARGET HANDLING ---
-    // Sicherheits-Attribut bei _blank automatisch hinzufügen
-    $rel = ($target === '_blank') ? 'noopener noreferrer' : null;
 @endphp
 
-<a href="{{ $href }}"
-   @if($target) target="{{ $target }}" @endif
-   @if($rel) rel="{{ $rel }}" @endif
-        {{ $attributes->class($classes) }}
->
+<a href="{{ $href }}" {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}>
     @if($icon && !$iconAppend)
         <x-bs::icon :name="$icon" class="me-1"/>
     @endif

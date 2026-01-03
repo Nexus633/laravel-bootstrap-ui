@@ -1,67 +1,54 @@
 @props([
-    'name',
+    'name' => null,
     'label' => null,
     'rows' => 3,
     'hint' => null,
     'simple' => false,
-    'resize' => 'vertical', // 'vertical', 'horizontal', 'none', 'both'
+    'resize' => 'vertical',
 ])
 
 @php
-    // ID generieren falls nicht übergeben
-    $id = $attributes->get('id', 'textarea-' . uniqid());
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    // Floating Logic extrahieren (Konsistent mit Input-Komponente)
-    $isFloating = filter_var($attributes->get('label:floating'), FILTER_VALIDATE_BOOLEAN);
+    $field = BootstrapUi::make($name);
 
-    // Das Attribut entfernen, damit es nicht im HTML landet
-    $attributes = $attributes->except(['label:floating']);
+    $isFloating = $attributes->pluck('label:floating');
+    $id = $attributes->getOrCreateId('textarea-');
+    $hasError = $field->hasError();
 
-    // Error Logik
-    $hasError = $name && $errors->has($name);
+    $field->addClass('form-control')
+          ->addClassWhen($hasError, 'is-invalid')
+          ->addStyleWhen($resize, 'resize', $resize)
+          ->addStyleWhen(!$simple, 'height', 'calc(2.5rem + ' . ($rows * 1.5) . 'rem)');
 
-    // Basis CSS Klassen
-    $classes = ['form-control'];
-    if ($hasError) $classes[] = 'is-invalid';
 @endphp
 
 @if($simple)
-    {{-- SIMPLE MODE: Nur das Element (z.B. für Input Groups) --}}
     <textarea
-            name="{{ $name }}"
-            id="{{ $id }}"
-            rows="{{ $rows }}"
-            style="resize: {{ $resize }}"
-        {{ $attributes->class($classes) }}
+        name="{{ $name }}"
+        id="{{ $id }}"
+        rows="{{ $rows }}"
+        {{ $attributes->class($field->getClasses())->merge(['style' => $field->getStyles()]) }}
     >{{ $slot }}</textarea>
-
 @else
-    {{-- WRAPPER MODE: Standard Nutzung mit Label/Error/Hint --}}
     <x-bs::input.wrapper :label="$label" :id="$id" :name="$name" :hint="$hint" :floating="$isFloating">
-
         @if($isFloating)
-            {{-- Floating Label Implementation --}}
-            {{-- Hinweis: Floating Labels benötigen eine definierte Höhe via CSS, da 'rows' oft ignoriert wird --}}
             <div class="form-floating {{ $hasError ? 'is-invalid' : '' }}">
                 <textarea
-                        name="{{ $name }}"
-                        id="{{ $id }}"
-                        placeholder="{{ $label }}"
-                        style="resize: {{ $resize }}; height: calc(2.5rem + {{ $rows * 1.5 }}rem);"
-                    {{ $attributes->class($classes) }}
-                >{{ $slot }}</textarea>
-                <label for="{{ $id }}">{{ $label }}</label>
-            </div>
-        @else
-            {{-- Standard Implementation --}}
-            <textarea
                     name="{{ $name }}"
                     id="{{ $id }}"
-                    rows="{{ $rows }}"
-                    style="resize: {{ $resize }}"
-                {{ $attributes->class($classes) }}
+                    placeholder="{{ $label }}"
+                    {{ $attributes->class($field->getClasses())->merge(['style' => $field->getStyles()]) }}
+                >{{ $slot }}</textarea>
+                <x-bs::text label for="{{ $id }}">{{ $label }}</x-bs::text>
+            </div>
+        @else
+            <textarea
+                name="{{ $name }}"
+                id="{{ $id }}"
+                rows="{{ $rows }}"
+                {{ $attributes->class($field->getClasses()) }}
             >{{ $slot }}</textarea>
         @endif
-
     </x-bs::input.wrapper>
 @endif

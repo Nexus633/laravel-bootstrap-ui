@@ -8,19 +8,19 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
 
-    $captionTitle = $attributes->get('caption:title', $captionTitle);
-    $captionText = $attributes->get('caption:text', $captionText);
-    $attributes = $attributes->except(['caption:title', 'caption:text']);
-    $classes = [
-        'carousel-item',
-        'active' => $active,
-    ];
+    $captionTitle = $attributes->pluck('caption:title', $captionTitle);
+    $captionText = $attributes->pluck('caption:text', $captionText);
+
+    $field->addClass('carousel-item')
+          ->addClassWhen($active, 'active')
+          ->addDataWhen($interval, 'data-bs-interval', $interval);
+
 @endphp
 
-<div {{ $attributes->class($classes) }}
-     @if($interval) data-bs-interval="{{ $interval }}" @endif>
-
+<div {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}>
     {{-- BILD (Optional) --}}
     @if($image)
         <img src="{{ $image }}" class="d-block w-100" alt="{{ $alt }}">

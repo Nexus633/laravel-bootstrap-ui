@@ -13,12 +13,9 @@
 ])
 
 @php
-    $successIcon = $attributes->get('icon:success', $successIcon);
-    $successLabel = $attributes->get('label:success', $successLabel);
-    $successVariant = $attributes->get('variant:success', $successVariant);
-
-    $attributes = $attributes->except(['icon:success', 'label:success', 'variant:success']);
-
+    $successIcon = $attributes->pluck('icon:success', $successIcon);
+    $successLabel = $attributes->pluck('label:success', $successLabel);
+    $successVariant = $attributes->pluck('variant:success', $successVariant);
 
     $hasLabel = !empty($label) || !empty($successLabel);
 
@@ -54,12 +51,11 @@
         variant="custom-override"
         :size="$size"
         @click="copyToClipboard()"
-        class="{{ $baseClass }}"
+        {{ $attributes->merge(['class' => $baseClass]) }}
         x-bind:class="{
             '{{ $baseClass }}': !copied,
             '{{ $doneClass }}': copied
         }"
-        {{ $attributes }}
     >
         <div class="d-flex align-items-center justify-content-center">
 

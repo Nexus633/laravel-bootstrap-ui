@@ -11,44 +11,35 @@
 
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
     $iconClass = Icon::toClass($icon);
 
-    // Tag-Entscheidung
     if ($href) {
         $tag = 'a';
     } elseif ($attributes->has('type') || $attributes->has('wire:click') || $action) {
-        // Wenn es wie ein Button agiert
         $tag = 'button';
-        $action = true; // Buttons sind immer "Actionable"
+        $action = true;
     } else {
         $tag = 'li';
     }
-    
-    // Klassen
-    $classes = ['list-group-item'];
-    
-    // Bei Links/Buttons brauchen wir 'list-group-item-action' für den Hover
-    if (($tag === 'a' || $tag === 'button') || $action) {
-        $classes[] = 'list-group-item-action';
-    }
 
-    if ($active) $classes[] = 'active';
-    if ($disabled) $classes[] = 'disabled';
-    if ($variant) $classes[] = 'list-group-item-' . $variant;
-
-    // Flexbox für Badge-Support (Text links, Badge rechts)
-    if ($badge) {
-        $classes[] = 'd-flex justify-content-between align-items-center';
-    }
+    $field = BootstrapUi::make();
+    $field->addClass('list-group-item')
+          ->addClassWhen(($tag === 'a' || $tag === 'button') || $action, 'list-group-item-action')
+          ->addClassWhen($active, 'active')
+          ->addClassWhen($disabled, 'disabled')
+          ->addClassWhen($variant, 'list-group-item-' . $variant)
+          ->addClassWhen($badge, ['d-flex', 'justify-content-between', 'align-items-center'])
+          ->addDataWhen($href, 'href', $href)
+          ->addDataWhen($disabled && $tag === 'button', 'disabled', 'disabled')
+          ->addDataWhen($disabled && $tag === 'a', 'aria-disabled', 'true')
+          ->addDataWhen($disabled && $tag === 'a', 'tabindex', '-1')
+          ->addDataWhen($active, 'aria-current', 'true')
+          ;
 @endphp
 
-<{{ $tag }}
-    @if($href) href="{{ $href }}" @endif
-@if($disabled && $tag === 'button') disabled @endif
-@if($disabled && $tag === 'a') aria-disabled="true" tabindex="-1" @endif
-@if($active) aria-current="true" @endif
-{{ $attributes->class($classes) }}
->
+<{{ $tag }} {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}>
 {{-- Inhalt Wrapper (nötig falls Flexbox durch Badge aktiv ist, damit Text zusammenbleibt) --}}
 @if($badge)
     <div>

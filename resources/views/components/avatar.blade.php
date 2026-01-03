@@ -6,27 +6,23 @@
     'shape' => 'circle',
     'variant' => 'secondary',
     'border' => false,
-
-    // Tooltip Props
     'tooltip' => null,
-    'placement' => 'top',       // top, right, bottom, left
+    'placement' => 'top',
 ])
 
 @php
-    // --- 0. OPTIONEN LESEN ---
-    // Prüfen, ob initials:single gesetzt ist
-    $singleInitial = $attributes->has('initials:single');
-    // Attribut entfernen, damit es nicht im HTML landet
-    $attributes = $attributes->except('initials:single');
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    // --- 1. INITIALEN LOGIK ---
+    $field = BootstrapUi::make();
+    
+    $singleInitial = $attributes->pluck('initials:single');
+
+    // Initials Logic
     $initials = '';
     if (!$src && $name) {
         if ($singleInitial) {
-            // Nur der allererste Buchstabe des gesamten Strings
             $initials = strtoupper(mb_substr($name, 0, 1));
         } else {
-            // Standard: Erste Buchstaben der ersten beiden Wörter (Max Mustermann -> MM)
             $parts = explode(' ', $name);
             foreach ($parts as $index => $part) {
                 if ($index < 2 && !empty($part)) {
@@ -36,22 +32,15 @@
         }
     }
 
-    // --- 2. AUTO-COLOR LOGIK ---
+    // Auto-color Logic
     if ($variant === 'auto') {
-        // Palette verfügbarer Farben (ohne 'light', da weißer Text dort nicht lesbar ist)
         $colors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'dark', 'indigo', 'purple', 'pink', 'teal'];
-
-        // Wir berechnen einen Hash aus dem Namen (z.B. crc32).
-        // Das sorgt dafür, dass "Max" IMMER Rot ist und "Lisa" IMMER Grün.
-        // Es ist also "zufällig", aber deterministisch (bleibt beim Reload gleich).
         $seed = $name ?? 'default';
         $hash = crc32($seed);
-
-        // Modulo-Operator wählt einen Index aus dem Array
         $variant = $colors[$hash % count($colors)];
     }
 
-    // --- 3. GRÖSSEN LOGIK ---
+    // Size Logic
     $sizes = [
         'xs' => ['size' => '24px', 'font' => '0.75rem'],
         'sm' => ['size' => '32px', 'font' => '0.875rem'],
@@ -59,91 +48,59 @@
         'lg' => ['size' => '64px', 'font' => '1.75rem'],
         'xl' => ['size' => '96px', 'font' => '2.5rem'],
     ];
-
     $config = $sizes[$size] ?? $sizes['md'];
-    $dimension = $config['size'];
-    $fontSize = $config['font'];
+    
+    // Use the helper for styles
+    $field->addStyle('width', $config['size'])
+          ->addStyle('height', $config['size'])
+          ->addStyle('font-size', $config['font']);
 
-    // --- 4. KLASSEN & STYLES ---
+    // Class Logic
     $shapes = [
         'circle'  => 'rounded-circle',
         'square'  => 'rounded-0',
         'rounded' => 'rounded',
-        'top'     => 'rounded-top',
-        'bottom'  => 'rounded-bottom',
-        'start'   => 'rounded-start',
-        'end'     => 'rounded-end',
     ];
-    $shapeClass = $shapes[$shape] ?? 'rounded-circle';
+    $shapeClass = $shapes[$shape] ?? $shape; // Allow custom shape classes
 
-   $classes = [
-        'd-inline-flex',
-        'align-items-center',
-        'justify-content-center',
-        'flex-shrink-0',
-        'align-middle',
-        $shapeClass,
-    ];
-
-    if ($border) $classes[] = 'border border-2 border-white';
-    if (!$src) $classes[] = 'text-bg-' . $variant;
-
-    $styles = "width: {$dimension}; height: {$dimension}; font-size: {$fontSize};";
-
-    // --- ALPINE TOOLTIP LOGIK ---
-    $alpineAttrs = [];
-
-    if ($tooltip) {
-        $alpineAttrs['x-data'] = '{}';
-
-        // 1. Placement als Data-Attribut (liest unsere Directive aus)
-        $alpineAttrs['data-bs-placement'] = $placement;
-
-        // 2. x-tooltip mit dem Text.
-        // WICHTIG: Wir müssen den String in Hochkommas packen für JS: 'Text'
-        // addslashes verhindert Fehler bei Namen wie "O'Connor"
-        $safeTooltip = addslashes($tooltip);
-        $alpineAttrs['x-tooltip'] = "'{$safeTooltip}'";
-
-        // Optional: Element fokussierbar machen für Tastatur-Nutzer
-        $alpineAttrs['tabindex'] = '0';
-    }
+    $field->addClass('d-inline-flex', 'align-items-center', 'justify-content-center', 'flex-shrink-0', 'align-middle', $shapeClass)
+          ->addClassWhen($border, ['border', 'border-2', 'border-white'])
+          ->addClassWhen(!$src, 'text-bg-' . $variant);
 @endphp
 
-@if($src)
-    @if($tooltip)
-        <x-bs::tooltip text="{{$tooltip}}" placement="{{$placement}}">
-            <img
-                src="{{ $src }}"
-                alt="{{ $alt ?? $name }}"
-                {{ $attributes->class($classes)->merge(['style' => $styles . ' object-fit: cover;']) }}
-            >
-        </x-bs::tooltip>
-    @else
-        <img
-            src="{{ $src }}"
-            alt="{{ $alt ?? $name }}"
-            {{ $attributes->class($classes)->merge(['style' => $styles . ' object-fit: cover;']) }}
-        >
-    @endif
+@php
+    $renderContent = function ($isImage) use ($src, $alt, $name, $attributes, $field, $initials) {
+        $finalStyles = $field->getStyles();
+        $extraStyle = $isImage ? ' object-fit: cover;' : ' user-select: none;';
+        
+        $commonAttributes = $attributes->class($field->getClasses())->merge(['style' => $finalStyles . $extraStyle]);
+
+        if ($isImage) {
+            echo '<img src="' . e($src) . '" alt="' . e($alt ?? $name) . '" ' . $commonAttributes . '>';
+        } else {
+            echo '<div ' . $commonAttributes . '>';
+            if ($initials) {
+                echo e($initials);
+            } else {
+                echo '<x-bs::icon name="person-fill" />';
+            }
+            echo '</div>';
+        }
+    };
+@endphp
+
+@if($tooltip)
+    <x-bs::tooltip :text="$tooltip" :placement="$placement">
+        @if($src)
+            {{ $renderContent(true) }}
+        @else
+            {{ $renderContent(false) }}
+        @endif
+    </x-bs::tooltip>
 @else
-    @if($tooltip)
-        <x-bs::tooltip text="{{$tooltip}}" placement="{{$placement}}">
-            <div {{ $attributes->class($classes)->merge(['style' => $styles . ' user-select: none;']) }} {{$attributes}}>
-                @if($initials)
-                    {{ $initials }}
-                @else
-                    <x-bs::icon name="person-fill" />
-                @endif
-            </div>
-        </x-bs::tooltip>
+    @if($src)
+        {{ $renderContent(true) }}
     @else
-        <div {{ $attributes->class($classes)->merge(['style' => $styles . ' user-select: none;']) }} {{$attributes}}>
-            @if($initials)
-                {{ $initials }}
-            @else
-                <x-bs::icon name="person-fill" />
-            @endif
-        </div>
+        {{ $renderContent(false) }}
     @endif
 @endif

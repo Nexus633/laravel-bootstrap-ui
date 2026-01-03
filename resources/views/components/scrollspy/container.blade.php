@@ -4,13 +4,20 @@
     'smooth' => true,    // Weiches Scrollen
 ])
 
-<div
-    data-bs-spy="scroll"
-    data-bs-target="#{{ $target }}"
-    data-bs-smooth-scroll="{{ $smooth ? 'true' : 'false' }}"
-    tabindex="0"
-    {{ $attributes->class(['scrollspy-example', 'bg-body-tertiary', 'p-3', 'rounded-2']) }}
-    style="height: {{ $height }}; overflow-y: scroll; position: relative;"
->
+@php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+
+    $field->addClass('scrollspy-example', 'bg-body-tertiary', 'p-3', 'rounded-2')
+          ->addData('data-bs-spy', 'scroll')
+          ->addData('data-bs-target', '#' . $target)
+          ->addDataWhen($smooth, 'data-bs-smooth-scroll', 'true', 'false')
+          ->addData('tabindex', '0')
+          ->addStyle('height', $height)
+          ->addStyle('overflow-y', 'scroll')
+          ->addStyle('position', 'relative');
+@endphp
+
+<div {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes())->merge(['style' => $field->getStyles()]) }}>
     {{ $slot }}
 </div>

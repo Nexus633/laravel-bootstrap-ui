@@ -10,14 +10,17 @@
 ])
 
 @php
-    $classes = ['table', 'mb-0'];
-    if ($striped)    $classes[] = 'table-striped';
-    if ($hover)      $classes[] = 'table-hover';
-    if ($bordered)   $classes[] = 'table-bordered';
-    if ($borderless) $classes[] = 'table-borderless';
-    if ($small)      $classes[] = 'table-sm';
-    if ($variant)    $classes[] = 'table-' . $variant;
-    if ($captionTop) $classes[] = 'caption-top';
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $field = BootstrapUi::make();
+    $field->addClass('table', 'mb-0')
+          ->addClassWhen($striped, 'table-striped')
+          ->addClassWhen($hover, 'table-hover')
+          ->addClassWhen($bordered, 'table-bordered')
+          ->addClassWhen($borderless, 'table-borderless')
+          ->addClassWhen($small, 'table-sm')
+          ->addClassWhen($variant, 'table-' . $variant)
+          ->addClassWhen($captionTop, 'caption-top');
 @endphp
 
 @if($responsive)
@@ -27,7 +30,7 @@
 
     <table
         x-data="bsTableSticky"
-        {{ $attributes->class($classes) }}
+        {{ $attributes->class($field->getClasses()) }}
     >
         {{ $slot }}
     </table>

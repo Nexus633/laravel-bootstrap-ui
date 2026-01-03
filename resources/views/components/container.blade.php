@@ -4,16 +4,15 @@
 ])
 
 @php
-    $class = 'container';
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
 
-    if ($fluid) {
-        $class = 'container-fluid';
-    } elseif ($size) {
-        // Erzeugt z.B. container-lg
-        $class = 'container-' . $size;
-    }
+    $field->addClassWhen(!$fluid && !$size, 'container')
+          ->addClassWhen($fluid && !$size, 'container-fluid')
+          ->addClassWhen(!$fluid && $size, 'container-' . $size);
+
 @endphp
 
-<div {{ $attributes->merge(['class' => $class]) }}>
+<div {{ $attributes->class($field->getClasses()) }}>
     {{ $slot }}
 </div>

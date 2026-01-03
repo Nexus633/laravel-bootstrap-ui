@@ -6,27 +6,17 @@
 ])
 
 @php
-    // Basis-Logik: Toolbar vs. Group
-    if ($toolbar) {
-        $baseClass = 'btn-toolbar';
-        $role = 'toolbar';
-    } else {
-        $baseClass = $vertical ? 'btn-group-vertical' : 'btn-group';
-        $role = 'group';
-    }
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    $classes = [$baseClass];
+    $field = BootstrapUi::make();
 
-    // Größen-Klasse hinzufügen (gilt nicht für Toolbars, nur für Groups)
-    if ($size && !$toolbar) {
-        $classes[] = 'btn-group-' . $size;
-    }
+    $field->addClassWhen($toolbar, 'btn-toolbar', )
+          ->addClassWhen(!$toolbar, $vertical ? 'btn-group-vertical' : 'btn-group')
+          ->addClassWhen($size && !$toolbar, 'btn-group-' . $size)
+          ->addDataWhen($toolbar, 'role', 'toolbar', 'group')
+          ->addDataWhen($label, 'aria-label', $label);
 @endphp
 
-<div
-        role="{{ $role }}"
-        @if($label) aria-label="{{ $label }}" @endif
-        {{ $attributes->class($classes) }}
->
+<div {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}>
     {{ $slot }}
 </div>

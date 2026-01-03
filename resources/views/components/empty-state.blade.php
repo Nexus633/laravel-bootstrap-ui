@@ -1,5 +1,5 @@
 @props([
-    'title',
+    'title' => null,
     'text' => null,
     'icon' => null,
     /*
@@ -12,8 +12,7 @@
 
 @php
     // Attribut gewinnt vor Prop (ermöglicht <x-bs::empty-state icon:size="2" ... />)
-    $iconSize = $attributes->get('icon:size', $iconSize);
-    $attributes = $attributes->except('icon:size');
+    $iconSize = $attributes->pluck('icon:size', $iconSize);
 @endphp
 
 <div {{ $attributes->merge(['class' => 'text-center py-5']) }}>
@@ -25,10 +24,12 @@
         </div>
     @endif
 
-    {{-- Überschrift --}}
-    <h4 class="fw-bold text-body-emphasis">
-        {{ $title }}
-    </h4>
+    @if($title)
+        {{-- Überschrift --}}
+        <h4 class="fw-bold text-body-emphasis">
+            {{ $title }}
+        </h4>
+    @endif
 
     {{-- Text --}}
     @if($text)

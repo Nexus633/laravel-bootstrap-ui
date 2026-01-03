@@ -1,4 +1,8 @@
-@props(['href' => '#', 'logo' => null, 'name' => null])
+@props([
+    'href' => '#',
+    'logo' => null,
+    'name' => null
+])
 
 <a href="{{ $href }}" class="d-flex align-items-center text-decoration-none text-body-emphasis gap-2">
     @if($logo)

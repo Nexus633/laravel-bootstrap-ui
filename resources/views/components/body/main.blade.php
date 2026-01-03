@@ -1,5 +1,8 @@
 @php
-    $classes = [
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $field = BootstrapUi::make();
+    $field->addClass(
         'flex-grow-1',
         'd-flex',
         'flex-column',
@@ -7,9 +10,10 @@
         'w-100',
         'overflow-hidden',
         'position-relative'
-    ];
+    );
+
 @endphp
 
-<main {{ $attributes->class($classes) }}>
+<main {{ $attributes->class($field->getClasses()) }}>
     {{ $slot }}
 </main>

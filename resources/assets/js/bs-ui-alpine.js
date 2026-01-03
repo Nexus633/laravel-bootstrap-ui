@@ -280,9 +280,9 @@ function registerAlpineFunctions() {
     }));
 
     // ==========================================
-    // UI STATE (Tabs / Accordion)
+    // UI STATE (Accordion)
     // ==========================================
-    Alpine.data('bsUiState', (id, type = 'tab', usePersist = false) => ({
+    Alpine.data('bsUiState', (id, type = 'accordion', usePersist = false) => ({
         activeItems: [],
         storageKey: 'bs-ui-' + id,
         _lwHook: null, // Speicher für Livewire Hook
@@ -309,15 +309,7 @@ function registerAlpineFunctions() {
         },
 
         registerListeners() {
-            // DOM-Listener auf this.$el werden vom Browser automatisch aufgeräumt,
-            // wenn das Element aus dem DOM entfernt wird. Hier ist kein manuelles
-            // removeEventListener nötig, solange es nicht 'window' oder 'document' ist.
-            if (type === 'tab') {
-                this.$el.addEventListener('shown.bs.tab', (e) => {
-                    const target = e.target.getAttribute('data-bs-target');
-                    this.saveState([target]);
-                });
-            } else if (type === 'accordion') {
+            if (type === 'accordion') {
                 this.$el.addEventListener('shown.bs.collapse', (e) => {
                     if (e.target.closest('.accordion') === this.$el) this.addItem(e.target.id);
                 });
@@ -340,13 +332,7 @@ function registerAlpineFunctions() {
         restoreState() {
             if (!this.activeItems?.length || !document.body.contains(this.$el)) return;
 
-            if (type === 'tab') {
-                const activeId = this.activeItems[0];
-                const trigger = this.$el.querySelector(`[data-bs-target="${activeId}"]`);
-                if (trigger && !trigger.classList.contains('active')) {
-                    bootstrap.Tab.getOrCreateInstance(trigger).show();
-                }
-            } else if (type === 'accordion') {
+            if (type === 'accordion') {
                 this.activeItems.forEach(itemId => {
                     const content = document.getElementById(itemId);
                     if (content && !content.classList.contains('show')) {
@@ -1327,6 +1313,150 @@ function registerAlpineFunctions() {
                 this.currentHtml = this.prettyHtml; this.currentRaw = this.rawPretty;
             } else {
                 this.currentHtml = this.minifiedHtml; this.currentRaw = this.rawMinified;
+            }
+        }
+    }));
+
+    // ==========================================
+    // COMMAND PALETTE LOGIC
+    // ==========================================
+    Alpine.data('bsCommandPalette', (serverGroups, modalId) => ({
+        search: '',
+        selectedIndex: 0,
+        groups: serverGroups, // Startet mit den globalen Daten
+        isActive: false,      // Steuert Tastatur-Events
+
+        init() {
+            // 1. Lokale Items aus dem Slot einsammeln
+            this.collectDeclarativeItems();
+
+            // 2. Auf Bootstrap Modal Events hören (via jQuery oder Native)
+            const modalEl = document.getElementById(modalId);
+
+            if (modalEl) {
+                modalEl.addEventListener('shown.bs.modal', () => {
+                    this.isActive = true;
+                    this.search = '';
+                    this.selectedIndex = 0;
+                    // Fokus auf Input erzwingen
+                    if(this.$refs.searchInput) this.$refs.searchInput.focus();
+                });
+
+                modalEl.addEventListener('hidden.bs.modal', () => {
+                    this.isActive = false;
+                });
+            }
+        },
+
+        closePalette() {
+            const modalEl = document.getElementById(modalId);
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if(modalInstance) modalInstance.hide();
+        },
+
+        collectDeclarativeItems() {
+            // Findet alle unsichtbaren Spans, die durch x-bs::command-palette.item erzeugt wurden
+            const elements = this.$el.querySelectorAll('[data-cp-declarative-item]');
+
+            elements.forEach(el => {
+                const groupName = el.dataset.group || 'Aktionen';
+                try {
+                    const item = JSON.parse(el.dataset.payload);
+
+                    if (!this.groups[groupName]) {
+                        this.groups[groupName] = [];
+                    }
+                    // Item zur Gruppe hinzufügen
+                    this.groups[groupName].push(item);
+                } catch (e) {
+                    console.error('CommandPalette: Invalid Item JSON', el);
+                }
+            });
+        },
+
+        // --- FILTERING ---
+        get filteredGroups() {
+            if (this.search === '') return this.groups;
+
+            const term = this.search.toLowerCase();
+            const result = {};
+
+            for (const [groupName, items] of Object.entries(this.groups)) {
+                const filtered = items.filter(item => {
+                    return item.label.toLowerCase().includes(term)
+                        || (item.description && item.description.toLowerCase().includes(term))
+                        || (item.keywords && item.keywords.toLowerCase().includes(term));
+                });
+
+                if (filtered.length > 0) result[groupName] = filtered;
+            }
+            return result;
+        },
+
+        // Flache Liste für Navigation (Pfeiltasten)
+        get flatItems() {
+            let flat = [];
+            // Reihenfolge der Gruppen ist hier wichtig, Object.values ist meist konsistent genug
+            for (const items of Object.values(this.filteredGroups)) {
+                flat = flat.concat(items);
+            }
+            return flat;
+        },
+
+        // --- NAVIGATION ---
+        onArrowDown() {
+            if (!this.isActive || this.flatItems.length === 0) return;
+            this.selectedIndex = (this.selectedIndex + 1) % this.flatItems.length;
+            this.scrollToActive();
+        },
+
+        onArrowUp() {
+            if (!this.isActive || this.flatItems.length === 0) return;
+            this.selectedIndex = (this.selectedIndex - 1 + this.flatItems.length) % this.flatItems.length;
+            this.scrollToActive();
+        },
+
+        scrollToActive() {
+            this.$nextTick(() => {
+                const activeEl = this.$refs.resultsContainer?.querySelector('.active');
+                if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            });
+        },
+
+        // --- EXECUTION ---
+        selectItem(index) {
+            if (!this.isActive) return;
+            const item = this.flatItems[index];
+            if (!item) return;
+
+            this.execute(item);
+        },
+
+        execute(item) {
+            // Modal schließen
+            const modalEl = document.getElementById(modalId);
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if(modalInstance) modalInstance.hide();
+
+            const action = item.action;
+            const params = item.params || {};
+
+            // A: URL Redirect
+            if (typeof action === 'string' && (action.startsWith('http') || action.startsWith('/'))) {
+                if (typeof Livewire !== 'undefined' && Livewire.navigate) {
+                    Livewire.navigate(action);
+                } else {
+                    window.location.href = action;
+                }
+                return;
+            }
+
+            // B: Livewire Event Dispatch
+            if (typeof action === 'string' && action.startsWith('event:')) {
+                const eventName = action.substring(6);
+                if (typeof Livewire !== 'undefined') {
+                    Livewire.dispatch(eventName, params);
+                }
             }
         }
     }));

@@ -1,9 +1,8 @@
-@props([
-    'height' => null,
+@aware([
     'language' => 'blade',
+    'height' => null,
     'lineVariant' => 'warning'
 ])
-
 @php
     if($lineVariant) $lineVariant = 'text-' . $lineVariant;
 @endphp

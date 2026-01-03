@@ -4,11 +4,13 @@
 ])
 
 @php
-    $classes = [
-        'placeholder-' . $animation
-    ];
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $field = BootstrapUi::make();
+    $field->addClass('placeholder-' . $animation)
+          ->addData('aria-hidden', 'true');
 @endphp
 
-<{{ $tag }} aria-hidden="true" {{ $attributes->class($classes) }}>
-{{ $slot }}
+<{{ $tag }} {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}>
+    {{ $slot }}
 </{{ $tag }}>

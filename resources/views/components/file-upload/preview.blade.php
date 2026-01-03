@@ -15,8 +15,7 @@
 @endphp
 
 @if(count($fileList) > 0)
-    <div class="mt-2"> {{-- Margin etwas verringert für den Simple Mode --}}
-
+    <div class="mt-2">
         {{-- ================= MODE: LIST & SIMPLE (Text Only) ================= --}}
         @if($displayMode === 'list' || $displayMode === 'simple')
             <div class="d-flex flex-column gap-2">

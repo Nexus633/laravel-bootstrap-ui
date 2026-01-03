@@ -10,8 +10,10 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\TreeView;
 
+    $field = BootstrapUi::make();
     // 1. Status ermitteln (Ist es ein Ordner?)
     // Entweder explizit übergeben oder via Slot-Prüfung
     $hasChildren = $isFolder ?? $slot->isNotEmpty();
@@ -36,15 +38,10 @@
         $iconOpen = $iconClosed;
     }
 
-    // 3. Farblogik (Variant)
-    if ($active) {
-        $colorClass = 'text-primary';
-    } elseif ($variant) {
-        $colorClass = 'text-' . $variant; // Manuelle Farbe
-    } else {
-        // Standard: Ordner = Warning (Gelb), Datei = Secondary (Grau)
-        $colorClass = $hasChildren ? 'text-warning' : 'text-secondary';
-    }
+    $field->addClass($hasChildren ? 'text-warning' : 'text-secondary') // 1. Das 'else' (Basis)
+          ->addClassWhen($variant, 'text-' . $variant)                 // 2. Das 'elseif' (Überschreibt Basis)
+          ->addClassWhen($active, 'text-primary')                      // 3. Das 'if' (Überschreibt alles)
+          ->addClass('me-2');
 
     // 4. Alpine Data
     $alpineData = "{ expanded: " . ($open ? 'true' : 'false') . " }";
@@ -61,7 +58,7 @@
     >
         {{-- Linke Seite: Icon & Text --}}
         <div class="d-flex align-items-center overflow-hidden">
-            <span class="me-2 {{ $colorClass }}">
+            <span class="{{ $field->getClasses() }}">
                 @if($hasChildren)
                     {{-- Toggle Logik für Ordner --}}
                     <span x-show="!expanded">

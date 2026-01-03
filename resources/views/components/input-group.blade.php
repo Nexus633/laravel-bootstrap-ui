@@ -7,7 +7,7 @@
 ])
 
 @php
-    $id = $id ?? 'group-' . uniqid();
+    $id = $attributes->getOrCreateId('group-');
 @endphp
 
 {{-- Wir nutzen denselben Wrapper, damit Labels & Errors konsistent aussehen --}}

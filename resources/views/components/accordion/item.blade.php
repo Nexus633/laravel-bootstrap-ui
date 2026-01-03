@@ -3,21 +3,26 @@
     'title' => '',       // Der Titel (wird zum Slug, falls name fehlt)
     'icon' => null,
     'expanded' => false,
-    'variant' => null
+    'variant' => null,
+    'borderVariant' => null
 ])
 
 @aware([
     'id' => null,
     'alwaysOpen' => false,
-    'variant' => null
+    'variant' => null,
+    'borderVariant' => null
 ])
 
 @php
     use Illuminate\Support\Str;
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
 
+    $item = BootstrapUi::make($name);
+    $button = BootstrapUi::make($name);
     // 1. Parent ID sicherstellen (Fallback nötig, falls Parent keine ID hat)
-    $parentId = $id ?? 'accordion-' . md5('fallback');
+    $parentId = $attributes->getOrCreateId('accordion-');
 
     // 2. Suffix bestimmen (Die Magie)
     // Prio 1: Explizites 'name' Attribut
@@ -37,29 +42,29 @@
     $headerId   = $parentId . '-heading-' . $suffix;
     $collapseId = $parentId . '-collapse-' . $suffix;
 
-    $iconClass = Icon::toClass($icon);
+    $icon = Icon::toClass($icon);
 
-    // --- KLASSEN LOGIK (Bleibt gleich) ---
-    $itemClasses = ['accordion-item'];
-    if ($variant) $itemClasses[] = 'border-' . $variant;
+    // --- KLASSEN LOGIK ---
+    $item->addClass('accordion-item')
+         ->addClassWhen($borderVariant, 'border-' . $variant);
 
-    $buttonClasses = ['accordion-button'];
-    if (!$expanded) $buttonClasses[] = 'collapsed';
-    if ($variant) $buttonClasses[] = 'text-bg-' . $variant;
+    $button->addClass('accordion-button')
+         ->addClassWhen(!$expanded, 'collapsed')
+         ->addClassWhen($variant, 'text-bg-' . $variant);
 @endphp
 
-<div {{ $attributes->class($itemClasses) }}>
+<div {{ $attributes->class($item->getClasses()) }}>
     <h2 class="accordion-header" id="{{ $headerId }}">
         <button
-            class="{{ implode(' ', $buttonClasses) }}"
+            class="{{ $button->getClasses() }}"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target="#{{ $collapseId }}"
             aria-expanded="{{ $expanded ? 'true' : 'false' }}"
             aria-controls="{{ $collapseId }}"
         >
-            @if($iconClass)
-                <i class="{{ $iconClass }} me-2"></i>
+            @if($icon)
+                <x-bs::icon :name="$icon" class="me-2" />
             @endif
             {{ $title }}
         </button>

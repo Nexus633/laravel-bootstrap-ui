@@ -9,23 +9,29 @@
 ])
 
 @php
-    $classes = ['progress-bar'];
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
 
-    if ($variant)  $classes[] = 'bg-' . $variant;
-    if ($striped)  $classes[] = 'progress-bar-striped';
-    if ($animated) $classes[] = 'progress-bar-animated';
-    
     // Berechnung für width
     $width = ($value - $min) / ($max - $min) * 100;
+
+    // Attribute
+    $field->addClass('progress-bar')
+          ->addClassWhen($variant, 'bg-' . $variant)
+          ->addClassWhen($striped, 'progress-bar-striped')
+          ->addClassWhen($animated, 'progress-bar-animated')
+          ->addData('role', 'progressbar')
+          ->addData('aria-valuenow', $value)
+          ->addData('aria-valuemin', $min)
+          ->addData('aria-valuemax', $max)
+          ->addStyle('width', $width . '%');
 @endphp
 
 <div
-        role="progressbar"
-        aria-valuenow="{{ $value }}"
-        aria-valuemin="{{ $min }}"
-        aria-valuemax="{{ $max }}"
-        style="width: {{ $width }}%"
-        {{ $attributes->class($classes) }}
+    {{ $attributes->class($field->getClasses())
+                  ->merge($field->getDataAttributes())
+                  ->merge(['style' => $field->getStyles()])
+    }}
 >
     @if($label)
         {{ round($width) }}%

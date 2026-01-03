@@ -8,24 +8,27 @@
 
 @php
     use Nexus633\BootstrapUi\Facades\Icon;
-    $classes = 'dropdown-item d-flex align-items-center';
-    if ($active) $classes .= ' active';
-    if ($disabled) $classes .= ' disabled';
-    if ($danger) $classes .= ' text-danger';
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $ui = BootstrapUi::make();
+    $ui->addClass('dropdown-item', 'd-flex', 'align-items-center')
+       ->addClassWhen($active, 'active')
+       ->addClassWhen($disabled, 'disabled')
+       ->addClassWhen($danger, 'text-danger');
+
     $icon = Icon::toClass($icon);
-    // Tag bestimmen: Link oder Button?
     $tag = $href ? 'a' : 'button';
 @endphp
 
 <li>
     <{{ $tag }}
         @if($href) href="{{ $href }}" @else type="button" @endif
-    {{ $attributes->merge(['class' => $classes]) }}
+        {{ $attributes->class($ui->getClasses()) }}
     >
-    @if($icon)
-        <i class="{{ $icon }} me-2 opacity-75"></i>
-    @endif
+        @if($icon)
+            <x-bs::icon :name="$icon" class="me-2 opacity-75" />
+        @endif
 
-    <span>{{ $slot }}</span>
-</{{ $tag }}>
+        <span>{{ $slot }}</span>
+    </{{ $tag }}>
 </li>

@@ -1,5 +1,5 @@
 @props([
-    'name',
+    'name' => null,
     'label' => null,
     'placeholder' => 'Farbe oder Name (z.B. red)',
     'presets' => [],
@@ -10,24 +10,28 @@
 ])
 
 @php
-    $id = $attributes->get('id', 'cp-' . uniqid());
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    
+    $field = BootstrapUi::make($name);
+    $id = $attributes->getOrCreateId('cp-');
+    $hasError = $field->hasError();
 
-    // Livewire Logik: Wir bereiten das Model vor
+    // Livewire/Alpine logic remains the same
     $wireModel = $attributes->wire('model');
-
-    // Entweder ein Livewire-Objekt (@entangle) oder der statische Wert als String
     if ($wireModel->directive()) {
         $alpineValue = "window.Livewire.find('{$this->getId()}').entangle('{$wireModel->value()}')";
     } else {
-        // Falls kein Livewire: Nutze den 'value' prop oder default '#000000'
-        // json_encode sorgt dafür, dass Strings sicher an JS übergeben werden
         $val = $attributes->get('value', '#000000');
         $alpineValue = json_encode($val);
     }
+    
+    // Class building for the text input
+    $inputField = BootstrapUi::make($name)
+                    ->addClass('font-monospace')
+                    ->addClassWhen($hasError, 'is-invalid');
 @endphp
 
 <div
-    {{-- HIER IST DER CLEANUP: Wir rufen nur noch die JS-Funktion auf --}}
     x-data="bsColorPicker({{ $alpineValue }})"
     class="mb-3"
 >
@@ -37,7 +41,7 @@
         :name="$name"
         :hint="$hint"
     >
-        <x-bs::input.group>
+        <x-bs::input.group :class="$hasError ? 'is-invalid' : ''">
 
             {{-- A. COLOR TRIGGER --}}
             <x-bs::input-group.text class="p-1" style="min-width: 3rem;">
@@ -64,8 +68,8 @@
                         :id="$id"
                         :name="$name"
                         x-model.debounce.300ms="textValue"
-                        placeholder="{{ $placeholder }}"
-                        class="font-monospace"
+                        :placeholder="$placeholder"
+                        class="{{ $inputField->getClasses() }}"
                         :readonly="$readonly"
                         :disabled="$disabled"
                     />
@@ -78,8 +82,8 @@
                     :id="$id"
                     :name="$name"
                     x-model.debounce.300ms="textValue"
-                    placeholder="{{ $placeholder }}"
-                    class="font-monospace"
+                    :placeholder="$placeholder"
+                    class="{{ $inputField->getClasses() }}"
                     :readonly="$readonly"
                     :disabled="$disabled"
                 />
@@ -95,10 +99,8 @@
                         type="button"
                         class="p-0 border rounded-circle shadow-sm position-relative"
                         style="width: 24px; height: 24px; background-color: {{ $preset }};"
-                        {{-- Klick setzt den Text-Wert --}}
                         @click="textValue = '{{ $preset }}'"
                         title="{{ $preset }}"
-                        {{-- Aktiven Status prüfen --}}
                         x-bind:class="(textValue && textValue.toLowerCase() === '{{ strtolower($preset) }}') ? 'ring-2 ring-primary border-primary' : ''"
                         :disabled="$disabled"
                         variant="light"

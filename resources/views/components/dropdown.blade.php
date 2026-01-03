@@ -9,79 +9,76 @@
     'nav' => false, // NEU: Schaltet in den Navbar-Modus
 ])
 
+@aware([
+    // aus der nav komponente
+    'start' => false,
+    'end' => false
+])
+
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
 
-    $noCaret = $attributes->get('no:caret', $noCaret);
+    $noCaret = $attributes->pluck('no:caret', $noCaret);
     $iconClass = Icon::toClass($icon);
 
-    // --- 1. MODUS ENTSCHEIDUNG ---
+    $wrapperUi = BootstrapUi::make();
+    $triggerUi = BootstrapUi::make();
+    $menuUi = BootstrapUi::make()->addClass('dropdown-menu', 'shadow');
+
+    $triggerAttrs = [];
+
     if ($nav) {
-        // A. Navbar Modus
         $wrapperTag = 'li';
-        // Nav Items sind fast immer 'dropdown', Richtungen wie 'dropup' sind in Navbars selten/anders
-        $wrapperClasses = ['nav-item', 'dropdown'];
+        $wrapperUi->addClass('nav-item', 'dropdown');
 
         $triggerTag = 'a';
-        $triggerClasses = ['nav-link'];
-        $triggerAttrs = ['href' => '#', 'role' => 'button'];
-
+        $triggerUi->addClass('nav-link')
+                  ->addData('href', '#')
+                  ->addData('role', 'button');
     } else {
-        // B. Button Modus (Dein alter Code)
         $wrapperTag = 'div';
-
-        // Richtungs-Logik (nur für Buttons relevant)
-        $dirClass = match ($direction){
-            'up' => 'dropup',
-            'up-center' => 'dropup-center dropup',
-            'left' => 'dropstart',
-            'right' => 'dropend',
-            'center' => 'dropdown-center',
-            default => 'dropdown'
-        };
-        $wrapperClasses = [$dirClass];
+        $wrapperUi->addClass(
+            match ($direction) {
+                'up' => 'dropup',
+                'up-center' => 'dropup-center dropup',
+                'left' => 'dropstart',
+                'right' => 'dropend',
+                'center' => 'dropdown-center',
+                default => 'dropdown'
+        });
 
         $triggerTag = 'button';
-        $triggerClasses = ['btn', 'btn-' . $variant];
-        if ($size) $triggerClasses[] = 'btn-' . $size;
-        $triggerAttrs = ['type' => 'button'];
+        $triggerUi->addClass('btn', 'btn-' . $variant)
+                  ->addClassWhen($size, 'btn-' . $size)
+                  ->addData('type', 'button');
     }
 
-    // --- 2. GEMEINSAME LOGIK ---
-
-    // Toggle Pfeil Logik
-    if (!$noCaret) {
-        $triggerClasses[] = 'dropdown-toggle';
-    }
-
-    // Menü Ausrichtung
-    $menuClasses = ['dropdown-menu', 'shadow'];
-    if ($align === 'end') $menuClasses[] = 'dropdown-menu-end';
-
-    // Attribute bereinigen
-    $attributes = $attributes->except(['no:caret']);
+    $triggerUi->addClassWhen(!$noCaret, 'dropdown-toggle');
+    $menuUi->addClassWhen($align === 'end' || $end, 'dropdown-menu-end')
+           ->addClassWhen($align === 'start' || $start, 'dropdown-menu-start');
 @endphp
 
-<{{ $wrapperTag }} class="{{ implode(' ', $wrapperClasses) }}">
+<{{ $wrapperTag }} {{ $attributes->class($wrapperUi->getClasses()) }}>
     <{{ $triggerTag }}
-        {{-- Attribute wie id, wire:click etc. kommen hier rein --}}
-        {{ $attributes->merge(['class' => implode(' ', $triggerClasses)]) }}
-
-        {{-- Feste Attribute für Dropdown Funktion --}}
+        {{ $attributes->merge($triggerUi->getDataAttributes())->class($triggerUi->getClasses()) }}
+        {{-- Fügt Farb-Logik für aktive Nav-Pills hinzu --}}
+        @if($nav)
+        x-bind:class="{
+            ['text-bg-' + tabVariant]: $el.classList.contains('active') && tabType === 'pills' && tabVariant,
+            ['text-' + tabVariant]: $el.classList.contains('active') && tabType === 'tabs' && tabVariant,
+        }"
+        @endif
         data-bs-toggle="dropdown"
         aria-expanded="false"
-
-        {{-- Dynamische Attribute (href vs type) --}}
-        @foreach($triggerAttrs as $key => $val) {{ $key }}="{{ $val }}" @endforeach
     >
-    @if($iconClass)
-        <i class="bi {{ $iconClass }} @if($label) me-1 @endif"></i>
-    @endif
-    {{ $label }}
-</{{ $triggerTag }}>
+        @if($iconClass)
+            <i class="bi {{ $iconClass }} @if($label) me-1 @endif"></i>
+        @endif
+        {{ $label }}
+    </{{ $triggerTag }}>
 
-<ul class="{{ implode(' ', $menuClasses) }}">
-    {{ $slot }}
-</ul>
-
+    <ul class="{{ $menuUi->getClasses() }}">
+        {{ $slot }}
+    </ul>
 </{{ $wrapperTag }}>

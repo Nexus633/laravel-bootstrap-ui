@@ -8,7 +8,6 @@
     'labelEnd' => null,
     'transparent' => false,
 
-
     // Icons empfangen
     'iconPrepend' => null,
     'iconAppend' => null,

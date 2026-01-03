@@ -4,33 +4,21 @@
     'multiple' => false,
     'accept' => null,
     'variant' => 'primary'
-    // Label etc. kommen automatisch via $attributes in deine x-bs::input
 ])
 
 <div>
-    {{--
-        1. DEINE INPUT KOMPONENTE
-        Wir nutzen deine existierende Logik.
-        Alpine Attribute (@change, :disabled) werden durch dein $attributes->class()
-        in deiner Input-Komponente korrekt auf das HTML-Tag angewendet.
-    --}}
     <x-bs::input
         type="file"
         :id="$id"
         :name="$name"
         :multiple="$multiple"
         :accept="$accept"
-        {{-- Alle anderen Attribute (label, icon:prepend, floating...) durchreichen --}}
         :attributes="$attributes->merge([
             '@change' => 'handleFileSelect',    // Alpine Upload Trigger
             ':disabled' => 'isUploading',       // Deaktivieren beim Laden
         ])"
     />
 
-    {{--
-        2. PROGRESS BAR (Unterhalb)
-        Erscheint nur beim Upload, schiebt sich dazwischen.
-    --}}
     <div
         x-show="isUploading"
         style="display: none;"

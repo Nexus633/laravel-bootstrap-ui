@@ -1,7 +1,7 @@
 @props([
-    'name',
-    'label' => __('bs::bootstrap-ui.file-upload.label') ?? 'Datei hochladen',
-    'zoneLabel' => __('bs::bootstrap-ui.file-upload.zone.label') ?? 'Datei hier ablegen oder klicken',
+    'name' => null,
+    'label' => __('bs::bootstrap-ui.file-upload.label'),
+    'zoneLabel' => __('bs::bootstrap-ui.file-upload.zone.label'),
     'hint' => null,
     'multiple' => false,
     'accept' => null,
@@ -13,14 +13,21 @@
 ])
 
 @php
-    $id = $attributes->get('id', 'fileUpload-' . Str::slug($name));
-    $isMultiple = $multiple || $attributes->has('multiple');
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    
+    $field = BootstrapUi::make($name);
+    $id = $attributes->getOrCreateId('fileUpload-');
+    $hasError = $field->hasError();
 
-    // Preview Target bestimmen
+    $isMultiple = $multiple || $attributes->has('multiple');
     $previewTarget = $model ?? $name;
 
     if($simple && $displayMode === 'list') {
         $displayMode = 'simple';
+    }
+
+    if ($hasError) {
+        $attributes = $attributes->merge(['class' => 'is-invalid']);
     }
 @endphp
 
@@ -33,7 +40,6 @@
             isPreview: {{ $preview ? "true" : "false" }}
         })'
     >
-        {{-- WEICHE: Zone oder Simple --}}
         @if($simple)
             <x-bs::file-upload.simple
                 :id="$id"
@@ -55,8 +61,6 @@
                 :attributes="$attributes"
             />
         @endif
-
-
 
         @if($preview)
             <x-bs::file-upload.preview

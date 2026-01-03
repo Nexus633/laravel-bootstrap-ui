@@ -15,19 +15,15 @@
     use Nexus633\BootstrapUi\Facades\CodeHighlighter;
     use Illuminate\Support\Str;
 
-    $lineNumbers = $attributes->get('line:numbers', $lineNumbers);
-    $lineMarks = $attributes->get('line:marks', $lineMarks);
-    $lineVariant = $attributes->get('line:variant', $lineVariant);
+    $lineNumbers = $attributes->pluck('line:numbers', $lineNumbers);
+    $lineMarks = $attributes->pluck('line:marks', $lineMarks);
+    $lineVariant = $attributes->pluck('line:variant', $lineVariant);
 
-    $iconExpand = $attributes->get('icon:expand', $iconExpand);
-    $iconCollapse = $attributes->get('icon:collapse', $iconCollapse);
-
-    $attributes = $attributes->except([
-        'line:numbers', 'line:marks', 'line:variant', 'icon:expand', 'icon:collapse'
-    ]);
+    $iconExpand = $attributes->pluck('icon:expand', $iconExpand);
+    $iconCollapse = $attributes->pluck('icon:collapse', $iconCollapse);
 
     $content = $code ?? (string) $slot;
-    $uniqueId = 'bs-code-' . uniqid();
+    $uniqueId =  $attributes->getOrCreateId('code-');
 
     // Daten via Service holen
     $processed = CodeHighlighter::process($content, $language);
@@ -87,7 +83,7 @@
             </x-slot:header>
 
             {{-- Inhalt (Code) --}}
-            <x-bs::code-block.code :height="$height" :language="$language" :line-variant="$lineVariant"/>
+            <x-bs::code-block.code />
 
         </x-bs::card>
     @endif
@@ -111,7 +107,7 @@
                 </div>
             </div>
             {{-- Inhalt (Code) --}}
-            <x-bs::code-block.code :height="$height" :language="$language" :line-variant="$lineVariant"/>
+            <x-bs::code-block.code />
         </div>
     @endif
 </div>

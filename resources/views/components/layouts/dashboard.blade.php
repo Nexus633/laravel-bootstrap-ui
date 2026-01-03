@@ -35,7 +35,6 @@
     <x-bs::body.main>
         <x-bs::body.header>
             <x-bs::navbar expand="lg" bg="body" container="fluid" class="border-0 shadow-none">
-
                 <x-bs::navbar.collapse id="mainNav">
                     <x-bs::theme-toggle :variant="false"/>
                     {{-- Linke Seite --}}

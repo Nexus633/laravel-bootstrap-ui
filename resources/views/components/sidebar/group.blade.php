@@ -1,7 +1,11 @@
-@props(['label', 'icon' => null, 'prefix' => null])
+@props([
+    'label',
+    'icon' => null,
+    'prefix' => null
+])
 
 @php
-    $id = 'grp-' . md5($label);
+    $id = $attributes->getOrCreateId('grp-');
     
     // Wenn wir z.B. unter /users/create sind und prefix="users*" ist -> Open = true
     $isOpen = $prefix && request()->is($prefix);
@@ -29,10 +33,3 @@
         </ul>
     </div>
 </li>
-
-@once
-    <style>
-        button[aria-expanded="true"] .chevron-icon { transform: rotate(90deg); }
-        .chevron-icon { transition: transform 0.2s ease; }
-    </style>
-@endonce

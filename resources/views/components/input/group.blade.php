@@ -3,10 +3,12 @@
 ])
 
 @php
-    $classes = ['input-group'];
-    if ($size) $classes[] = 'input-group-' . $size;
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+    $field->addClass('input-group')
+          ->addClassWhen($size, 'input-group-' . $size);
 @endphp
 
-<div {{ $attributes->class($classes) }}>
+<div {{ $attributes->class($field->getClasses()) }}>
     {{ $slot }}
 </div>

@@ -14,39 +14,25 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
+
+    $field = BootstrapUi::make();
+    $field->addClass('card')
+          ->addClassWhen($variant, 'text-bg-' . $variant)
+          ->addClassWhen($align, 'text-' . $align);
+
+    if ($attributes->has('class') && str_contains($attributes->get('class'), 'h-100')) {
+        $field->addClass('h-100');
+    }
+
     $iconClass = Icon::toClass($icon);
 
-    $classes = ['card'];
-    if ($attributes->has('class') && str_contains($attributes->get('class'), 'h-100')) {
-        $classes[] = 'h-100';
-    }
-    if ($variant) {
-        $classes[] = 'text-bg-' . $variant;
-    }
-
-        // --- NEU: ALIGNMENT LOGIC ---
-    if ($align === 'end') {
-        // text-end ist der klassische Weg in Block-Containern (wie Card-Header)
-        $classes[] = 'text-end';
-    } elseif ($align === 'center') {
-        // Zentriert
-        $classes[] = 'text-center';
-    }
-
-    // --- MAGIE: HYBRID PROPS/SLOTS ---
-    // Wir prüfen: Gibt es einen Slot namens 'header'? 
-    // Wenn nein: Gibt es ein Attribut namens 'header'?
-    // Das Ergebnis speichern wir in $headerContent.
-    
-    $headerContent = $header ?? $attributes->get('header');
-    $footerContent = $footer ?? $attributes->get('footer');
-
-    // Attribute bereinigen, damit 'header=".."' nicht als HTML-Attribut im div landet
-    $attributes = $attributes->except(['header', 'footer']);
+    $headerContent = $header ?? $attributes->pluck('header');
+    $footerContent = $footer ?? $attributes->pluck('footer');
 @endphp
 
-<div {{ $attributes->class($classes) }}>
+<div {{ $attributes->class($field->getClasses()) }}>
 
     {{-- 1. Bild Oben --}}
     @if($image)

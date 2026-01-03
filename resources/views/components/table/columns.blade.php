@@ -4,13 +4,16 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+
     $tag = $footer ? 'tfoot' : 'thead';
 
     // Klasse vorbereiten (oder null, wenn keine Variante)
-    $variantClass = $variant ? 'table-' . $variant : null;
+    $field->addClassWhen($variant, 'table-' . $variant);
 @endphp
 
-<{{ $tag }} {{ $attributes->merge(['class' => $variantClass]) }}>
+<{{ $tag }} {{ $attributes->merge(['class' => $field->getClasses()]) }}>
     <tr>
         {{ $slot }}
     </tr>

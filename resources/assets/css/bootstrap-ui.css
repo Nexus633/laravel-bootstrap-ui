@@ -460,3 +460,32 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     z-index: 10;
     position: relative;
 }
+/* FIX: Horizontalen Scrollbalken erzwingend ausblenden.
+   Das ist der wichtigste Teil.
+*/
+.command-palette .modal-body {
+    overflow-x: hidden !important;
+}
+
+/* Scrollbar vertikal anpassen */
+.command-palette .modal-body::-webkit-scrollbar { width: 6px; }
+.command-palette .modal-body::-webkit-scrollbar-thumb {
+    background-color: var(--bs-border-color);
+    border-radius: 3px;
+}
+
+/* Active Item Style */
+.command-palette .cp-item.active-item {
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-emphasis-color);
+    font-weight: 500;
+}
+.command-palette .cp-item.active-item i {
+    color: var(--bs-primary) !important;
+}
+button[aria-expanded="true"] .chevron-icon {
+    transform: rotate(90deg);
+}
+.chevron-icon {
+    transition: transform 0.2s ease;
+}

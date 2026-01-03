@@ -10,25 +10,24 @@
 ])
 
 @php
-    $id = $id ?? 'carousel-' . uniqid();
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    $classes = [
-        'carousel',
-        'slide',
-        'carousel-fade' => $fade,
-    ];
+    $field = BootstrapUi::make();
+    $id = $attributes->getOrCreateId('carousel-');
 
-    $dataAttributes = [
-        'id' => $id,
-        'data-bs-ride' => $ride,
-        'data-bs-interval' => $interval,
-        'data-bs-touch' => $touch ? 'true' : 'false',
-        'data-bs-pause' => $pause,
-    ];
+    $field->addClass('carousel')
+          ->addClass('slide')
+          ->addClassWhen($fade, 'carousel-fade')
+          ->addDataWhen($id, 'id', $id)
+          ->addDataWhen($ride, 'data-bs-ride', $ride)
+          ->addDataWhen($interval, 'data-bs-interval', $interval)
+          ->addDataWhen($touch, 'data-bs-touch', 'true', 'false')
+          ->addDataWhen($pause, 'data-bs-pause', $pause);
+
 @endphp
 
 <div
-    {{ $attributes->merge($dataAttributes)->class($classes) }}
+    {{ $attributes->merge($field->getDataAttributes())->class($field->getClasses()) }}
     x-data="{
         total: 0,
         current: 0,

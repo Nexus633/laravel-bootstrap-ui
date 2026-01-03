@@ -7,18 +7,25 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+
+    $field->addClass('placeholder')
+          ->addClassWhen($cols, 'col-' . $cols)
+          ->addClassWhen($size, 'placeholder-' . $size)
+          ->addClassWhen($variant, 'bg-' . $variant)
+          ->addClassWhen($button, ['btn', 'disabled'])
+          ->addStyleWhen($width, 'width', $width)
+          ->addDataWhen($button, 'href', '#')
+          ->addDataWhen($button, 'tabindex', '-1');
+
     // Tag bestimmen: 'a' für Buttons (damit disabled styling greift), sonst 'span'
     $tag = $button ? 'a' : 'span';
 @endphp
 
 <{{ $tag }}
-    {{ $attributes->class([
-        'placeholder',
-        'col-' . $cols => $cols,                  // Nur wenn $cols gesetzt ist
-        'placeholder-' . $size => $size,          // Nur wenn $size gesetzt ist
-        'bg-' . $variant => $variant,             // Nur wenn $variant gesetzt ist
-        'btn disabled' => $button,                // Nur wenn button=true
-    ]) }}
-    @if($width) style="width: {{ $width }};" @endif
-@if($button) href="#" tabindex="-1" @endif
+    {{ $attributes->class($field->getClasses())
+                  ->merge($field->getDataAttributes())
+                  ->merge(['style' => $field->getStyles()])
+    }}
 ></{{ $tag }}>

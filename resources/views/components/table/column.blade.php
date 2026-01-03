@@ -9,30 +9,19 @@
 ])
 
 @php
-    // 1. Wir sammeln alle Klassen in einem Array
-    $classesArray = [
-        $variant ? 'table-' . $variant : null,
-        $sticky ? 'table-sticky-cell' : null,
-        $sortable ? 'cursor-pointer user-select-none' : null,
-    ];
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    // 2. Leere Einträge entfernen
-    $classesArray = array_filter($classesArray);
+    $field = BootstrapUi::make();
 
-    // 3. String bauen (oder null, damit das class-Attribut ganz wegfällt wenn leer)
-    $classString = empty($classesArray) ? null : implode(' ', $classesArray);
+    $field->addClassWhen($variant, 'table-' . $variant)
+          ->addClassWhen($sticky, 'table-sticky-cell')
+          ->addClassWhen($sortable, ['cursor-pointer', 'user-select-none'])
+          ->addDataWhen($sticky, 'data-sticky', 'true')
+          ->addDataWhen($sortable, 'role', 'button')
+          ->addStyleWhen($sortable, 'min-width', '80px');
 @endphp
 
-<th
-        {{-- Hier übergeben wir den kombinierten String an merge --}}
-        {{ $attributes->merge(['class' => $classString]) }}
-
-        {{-- Sticky Marker für unser Alpine JS --}}
-        @if($sticky) data-sticky="true" @endif
-
-        {{-- Layout Fix für Sortierung: Mindestbreite & Button Role --}}
-        @if($sortable) style="min-width: 80px;" role="button" @endif
->
+<th {{ $attributes->merge(['class' => $field->getClasses(), 'style' => $field->getStyles()])->merge($field->getDataAttributes()) }}>
     <div class="d-flex align-items-center justify-content-between gap-1">
 
         {{-- Inhalt (Text umbrechen verhindern) --}}

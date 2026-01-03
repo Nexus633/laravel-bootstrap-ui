@@ -6,30 +6,31 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
 
+    $field = BootstrapUi::make();
     // Wenn kein Link da ist, gehen wir davon aus, dass es die aktive Seite ist
     $isActive = $active || is_null($href);
     
-    $iconClass = Icon::toClass($icon);
+    $icon = Icon::toClass($icon);
 
-    // Array für die Klassen-Logik
-    $classes = [
-        'breadcrumb-item',
-        'active' => $isActive
-    ];
+    $field->addClass('breadcrumb-item')
+          ->addClassWhen($isActive, 'active')
+          ->addDataWhen($isActive, 'aria-current', 'page');
+
 @endphp
 
-<li {{ $attributes->class($classes) }} @if($isActive) aria-current="page" @endif>
+<li {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}>
     @if($isActive)
         {{-- Aktive Seite (Nur Text/Icon) --}}
-        @if($iconClass) <i class="{{ $iconClass }}"></i> @endif
+        @if($icon) <x-bs::icon :name="$icon" /> @endif
         {{ $title ?? $slot }}
     @else
         {{-- Link --}}
-        <a href="{{ $href }}" class="text-decoration-none">
-            @if($iconClass) <i class="{{ $iconClass }}"></i> @endif
+        <x-bs::link :href="$href" no-underline>
+            @if($icon) <x-bs::icon :name="$icon" /> @endif
             {{ $title ?? $slot }}
-        </a>
+        </x-bs::link>
     @endif
 </li>

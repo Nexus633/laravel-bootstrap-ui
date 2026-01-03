@@ -22,25 +22,24 @@
 ])
 
 @php
-    $valueId = $attributes->get('id', 'kvb-' . uniqid());
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    $labelSm = $attributes->get('label:sm', $labelSm);
-    $labelMd = $attributes->get('label:md', $labelMd);
-    $labelLg = $attributes->get('label:lg', $labelLg);
-    $labelXl = $attributes->get('label:xl', $labelXl);
-    $labelXxl = $attributes->get('label:xxl', $labelXxl);
+    $field = BootstrapUi::make();
 
-    $attributes = $attributes->except([
-        'label:sm', 'label:md', 'label:lg', 'label:xl', 'label:xxl'
-    ]);
+    $valueId = $attributes->getOrCreateId('kvb-');
 
-    $classes = [];
-    if($py) $classes[] = 'py-' . $py;
-    if($border) $classes[] = 'border-bottom';
+    $labelSm = $attributes->pluck('label:sm', $labelSm);
+    $labelMd = $attributes->pluck('label:md', $labelMd);
+    $labelLg = $attributes->pluck('label:lg', $labelLg);
+    $labelXl = $attributes->pluck('label:xl', $labelXl);
+    $labelXxl = $attributes->pluck('label:xxl', $labelXxl);
+
+    $field->addClassWhen($py, 'py-' . $py)
+          ->addClassWhen($border, 'border-bottom');
 
 @endphp
 
-<div {{ $attributes->class($classes) }}>
+<div {{ $attributes->class($field->getClasses()) }}>
 
     @if($vertical)
         {{--

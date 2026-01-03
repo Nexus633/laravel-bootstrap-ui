@@ -7,12 +7,14 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     $wireModel = $attributes->wire('model');
-    
-    $dialogClasses = ['modal-dialog'];
-    if($size) $dialogClasses[] = 'modal-' . $size;
-    if($centered) $dialogClasses[] = 'modal-dialog-centered';
-    if($scrollable) $dialogClasses[] = 'modal-dialog-scrollable';
+
+    $field = BootstrapUi::make();
+    $field->addClass('modal-dialog')
+          ->addClassWhen($size, 'modal-' . $size)
+          ->addClassWhen($centered, 'modal-dialog-centered')
+          ->addClassWhen($scrollable, 'modal-dialog-scrollable');
 @endphp
 
 <div
@@ -42,7 +44,7 @@
     "
     {{ $attributes }}
 >
-    <div class="{{ implode(' ', $dialogClasses) }}">
+    <div class="{{ $field->getClasses() }}">
         <div class="modal-content">
             {{ $slot }}
         </div>

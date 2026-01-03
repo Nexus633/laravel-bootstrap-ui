@@ -10,38 +10,24 @@
     'asInput' => false,
 ])
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Nexus633\BootstrapUi\Facades\Icon;
-    $asInput = $attributes->get('as:input', $asInput);
 
-    // 1. Basis-Klasse
-    $classes = Icon::toClass($name);
+    $field = BootstrapUi::make();
 
-    // Variable für CSS-Style initialisieren
-    $customStyle = null;
+    $asInput = $attributes->pluck('as:input', $asInput);
 
-// 2. Größe hinzufügen
-    if ($size) {
-        if (is_numeric($size)) {
-            // Bootstrap Klasse nutzen
-            $classes .= ' fs-' . $size;
-        } else {
-            // Custom CSS Style vorbereiten
-            $customStyle = 'font-size: ' . $size . ';';
-        }
-    }
-
-    // 3. Variante (Farbe) hinzufügen
-    // Aus variant="danger" wird class="text-danger"
-    if ($variant) {
-        $classes .= ' text-' . $variant;
-    }
+    $field->addClass(Icon::toClass($name))
+          ->addClassWhen($size && is_numeric($size), 'fs-' . $size)
+          ->addClassWhen($variant, 'text-' . $variant)
+          ->addStyleWhen($size && !is_numeric($size), 'font-size', $size);
 @endphp
 
 
 @if($asInput)
     <x-bs::input-group.text>
-        <i {{ $attributes->merge(['class' => $classes, 'style' => $customStyle]) }} aria-hidden="true"></i>
+        <i {{ $attributes->merge(['class' => $field->getClasses(), 'style' => $field->getStyles()]) }} aria-hidden="true"></i>
     </x-bs::input-group.text>
 @else
-    <i {{ $attributes->merge(['class' => $classes, 'style' => $customStyle]) }} aria-hidden="true"></i>
+    <i {{ $attributes->merge(['class' => $field->getClasses(), 'style' => $field->getStyles()]) }} aria-hidden="true"></i>
 @endif

@@ -9,11 +9,12 @@
 ])
 
 @php
-    // CustomAttributs
-    $badgeVariant = $attributes->get('badge:variant', $badgeVariant);
-    $activeVariant = $attributes->get('active:variant', $activeVariant);
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    $attributes = $attributes->except(['badge:variant', 'active:variant']);
+    $field = BootstrapUi::make();
+    // CustomAttributs
+    $badgeVariant = $attributes->pluck('badge:variant', $badgeVariant);
+    $activeVariant = $attributes->pluck('active:variant', $activeVariant);
 
     // 1. URL Normalisieren
     $path = ltrim($href, '/');
@@ -23,30 +24,16 @@
     // Sonst matcht es auch Unterseiten (z.B. /users/create matcht /users).
     $isActive = $exact ? request()->is($path) : request()->is($path . '*');
 
-    // 3. Styling
-    // Wir nutzen eine einfache Logik:
-    // Aktiv = wird vom prop activeVariant oder dem Attribut active:variant bestimmt. Standard: body-secondary
-    // Inaktiv = Transparenter Hintergrund + Graue Schrift.
-
-    $commonClasses = "nav-link d-flex align-items-center gap-3 py-2 px-3 rounded-3 transition-base";
-
-    if ($isActive) {
-        // === AKTIV ===
-        $classes = $commonClasses . ' bg-'. $activeVariant .' text-white shadow-sm fw-medium';
-        $iconClass = 'text-white'; // Icon muss auch weiß sein
-    } else {
-        // === INAKTIV ===
-        // Grau, beim Hover wird es leicht heller (body-secondary bg)
-        $classes = $commonClasses . ' text-body-secondary hover-bg-body-secondary';
-        $iconClass = 'text-body-tertiary'; // Icon etwas dunkler
-    }
+    $field->addClass('nav-link', 'd-flex', 'align-items-center', 'gap-3', 'py-2', 'px-3', 'rounded-3', 'transition-base')
+          ->addClassWhen($isActive, ['bg-' . $activeVariant, 'text-white', 'shadow-sm', 'fw-medium'])
+          ->addClassWhen(!$isActive, ['text-body-secondary', 'hover-bg-body-secondary']);
 @endphp
 
 <li class="nav-item">
-    <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
+    <a href="{{ $href }}" {{ $attributes->merge(['class' => $field->getClasses()]) }}>
 
         @if($icon)
-            <x-bs::icon :name="$icon" size="1.1rem" class="{{ $iconClass }}" />
+            <x-bs::icon :name="$icon" size="1.1rem" class="{{ $isActive ? 'text-white' : 'text-body-tertiary' }}" />
         @endif
 
         <span class="flex-grow-1 text-truncate" style="font-size: 0.95rem;">

@@ -8,35 +8,23 @@
 ])
 
 @php
-    // Basis-Klasse ermitteln (offcanvas vs offcanvas-lg)
-    $baseClass = $responsive ? 'offcanvas-' . $responsive : 'offcanvas';
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    $classes = [
-        $baseClass,
-        'offcanvas-' . $placement,
-    ];
+    $field = BootstrapUi::make()
+          ->addClassWhen($responsive, 'offcanvas-' . $responsive, 'offcanvas')
+          ->addClass('offcanvas-' . $placement)
+          ->addDataWhen($backdrop === 'static', 'data-bs-backdrop', 'static')
+          ->addDataWhen($backdrop === false, 'data-bs-backdrop', 'false')
+          ->addDataWhen($scroll, 'data-bs-scroll', 'true');
 
-    $dataAttrs = [];
-
-    // Backdrop Logik
-    if ($backdrop === 'static') {
-        $dataAttrs['data-bs-backdrop'] = 'static';
-    } elseif ($backdrop === false) {
-        $dataAttrs['data-bs-backdrop'] = 'false';
-    }
-
-    if ($scroll) {
-        $dataAttrs['data-bs-scroll'] = 'true';
-    }
-
-    $labelId = $id . '-label';
+    $labelId = $attributes->getOrCreateId('label-');
 @endphp
 
 <div
-        id="{{ $id }}"
-        tabindex="-1"
-        aria-labelledby="{{ $labelId }}"
-        {{ $attributes->merge($dataAttrs)->class($classes) }}
+    id="{{ $id }}"
+    tabindex="-1"
+    aria-labelledby="{{ $labelId }}"
+    {{ $attributes->merge($field->getDataAttributes())->class($field->getClasses()) }}
 >
     {{--
        HEADER

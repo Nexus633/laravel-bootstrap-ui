@@ -3,6 +3,11 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    use Nexus633\BootstrapUi\Facades\Icon;
+
+    $field = BootstrapUi::make();
+
     // CSS Klassen für Positionierung
     $positionClasses = [
         'top-start'     => 'top-0 start-0',
@@ -13,7 +18,10 @@
         'bottom-center' => 'bottom-0 start-50 translate-middle-x',
         'bottom-end'    => 'bottom-0 end-0',
     ];
-    $posClass = $positionClasses[$position] ?? 'top-0 end-0';
+
+    $field->addClass($positionClasses[$position] ?? 'top-0 end-0')
+          ->addClass('toast-container', 'position-fixed', 'p-3')
+          ->addStyle('z-index', '1060');
 
     // Konfiguration
     $configDuration = config('bootstrap-ui.toast.duration', 5000);
@@ -36,13 +44,13 @@
     if (session()->has('bs-toasts')) {
         foreach (session('bs-toasts') as $item) {
             $item['id'] = 'session-' . uniqid(); // ID sicherstellen
-            $item['icon'] = match($item['variant']) {
-                'success' => 'bi bi-check-circle-fill text-success',
-                'danger'  => 'bi bi-x-circle-fill text-danger',
-                'warning' => 'bi bi-exclamation-circle-fill text-warning',
-                'info'    => 'bi bi-info-circle-fill text-info',
-                default   => 'bi bi-bell-fill',
-            };
+            $item['icon'] = Icon::toClass(match($item['variant']) {
+                'success' => 'check-circle-fill text-success',
+                'danger'  => 'x-circle-fill text-danger',
+                'warning' => 'exclamation-circle-fill text-warning',
+                'info'    => 'info-circle-fill text-info',
+                default   => 'bell-fill',
+            });
             // Timestamp Fallback für Session Toasts
             if (!isset($item['timestamp'])) {
                 $item['timestamp'] = now()->format('H:i');
@@ -62,8 +70,7 @@
 
 <div
     wire:ignore
-    class="toast-container position-fixed p-3 {{ $posClass }}"
-    style="z-index: 1060;"
+    {{ $attributes->class($field->getClasses())->merge(['style' => $field->getStyles()]) }}
     x-data="bsToastStack(@js($jsConfig))"
 >
     <template x-for="t in toasts" :key="t.id">

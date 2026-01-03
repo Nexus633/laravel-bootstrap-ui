@@ -1,13 +1,16 @@
 @props([
-    'variant' => 'danger',      // Farbe (danger, primary, etc.)
-    'pill' => false,         // Runde Ecken (rounded-pill)
-    'dot' => false,          // Kleiner Punkt ohne Text
-    'border' => false,       // Weißer Rand zur Abgrenzung
-    'position' => null       // top-start, top-end, bottom-start, bottom-end
+    'variant' => 'danger',
+    'pill' => false,
+    'dot' => false,
+    'border' => false,
+    'position' => null
 ])
 
 @php
-    // Mapping deiner gewünschten Positionen auf Bootstrap-Klassen
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $field = BootstrapUi::make();
+
     $positions = [
         'top-start'    => 'top-0 start-0',
         'top-end'      => 'top-0 start-100',
@@ -15,27 +18,16 @@
         'bottom-end'   => 'top-100 start-100',
     ];
 
-    $classes = $attributes->class([
-        // Basis
-        'badge' => !$dot,
-        'p-2 rounded-circle' => $dot, // Dot braucht Padding um rund zu sein
-
-        // Farben (Text-Bg für Kontrast bei Text, nur BG bei Dots)
-        ($dot ? 'bg-' : 'text-bg-') . $variant,
-
-        // Styles
-        'rounded-pill' => $pill && !$dot,
-        'border border-light' => $border,
-
-        // Positioning Logic
-        'position-absolute translate-middle' => $position,
-        $positions[$position] ?? '',
-    ]);
+    $field->addClassWhen(!$dot, 'badge')
+          ->addClassWhen($dot, 'p-2', 'rounded-circle')
+          ->addClass(($dot ? 'bg-' : 'text-bg-') . $variant)
+          ->addClassWhen($pill && !$dot, 'rounded-pill')
+          ->addClassWhen($border, ['border', 'border-light'])
+          ->addClassWhen($position, ['position-absolute', 'translate-middle', $positions[$position] ?? '']);
 @endphp
 
-<span {{ $classes }}>
+<span {{ $attributes->class($field->getClasses()) }}>
     @if($dot)
-        {{-- Screenreader Text für Dots --}}
         <span class="visually-hidden">{{ $slot->isEmpty() ? 'Notification' : $slot }}</span>
     @else
         {{ $slot }}

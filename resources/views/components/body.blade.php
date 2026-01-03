@@ -3,20 +3,19 @@
 ])
 
 @php
-    $bodyVariant = $attributes->get('body:variant', $bodyVariant);
-    $attributes = $attributes->except(['body:variant']);
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-    $bodyColor = 'bg-body-' . $bodyVariant;
+    $field = BootstrapUi::make();
 
-    $classes = [
-        'd-flex',
-        'h-100',
-        'w-100',
-        'overflow-hidden',
-        $bodyColor,
-    ];
+    $bodyVariant = $attributes->pluck('body:variant', $bodyVariant);
+
+    $field->addClass('bg-body-' . $bodyVariant)
+          ->addClass('d-flex')
+          ->addClass('h-100')
+          ->addClass('w-100')
+          ->addClass('overflow-hidden');
 @endphp
 
-<body {{ $attributes->class($classes) }}>
+<body {{ $attributes->class($field->getClasses()) }}>
     {{ $slot }}
 </body>

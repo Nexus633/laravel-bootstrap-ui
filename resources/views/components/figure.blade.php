@@ -9,43 +9,35 @@
 ])
 
 @php
-    // 1. Ausrichtung der Caption (Standard: Links)
-    // Bootstrap Klassen: text-start, text-center, text-end
-    $captionClass = 'text-start';
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+    $img = BootstrapUi::make();
 
-    // 2. Textgröße der Caption (Standard: 'sm')
-    $captionSize = $attributes->get('caption:size', $captionSize);
+    $captionSize = $attributes->pluck('caption:size', $captionSize);
+    $center = $attributes->pluck('center');
+    $right = $attributes->pluck('right');
+    $left = $attributes->pluck('left');
 
-
-    // Boolean Flags prüfen
-    $center = $attributes->get('center');
-    $right = $attributes->get('right');
-    // 'left' ist Standard, muss nicht explizit geprüft werden, 
-    // aber wir holen es, um das Attribut zu säubern.
-    $left = $attributes->get('left');
-
-    if ($center) $captionClass = 'text-center';
-    if ($right)  $captionClass = 'text-end';
-
-
-    if($captionSize){
-        $captionClass .= match ($captionSize){
+    $field->addClass('figure-caption')
+          ->addClass('text-start')
+          ->addClassWhen($center, 'text-center')
+          ->addClassWhen($right, 'text-end')
+          ->addClassWhen($captionSize, match ($captionSize){
             'xs' => ' fs-6',
             'sm' => ' fs-5',
             'md' => ' fs-4',
             'lg' => ' fs-3',
             'xl' => ' fs-2',
             'xxl' => ' fs-1',
-        };
-    }
-    
-    // Attribute säubern, damit 'center="center"' nicht im HTML landet
-    $attributes = $attributes->except(['center', 'right', 'left', '$captionSize']);
+            default => null
+        });
 
     // 2. Bild-Klassen zusammenbauen
     $imgClasses = ['figure-img'];
-    if ($fluid)   $imgClasses[] = 'img-fluid';
-    if ($rounded) $imgClasses[] = 'rounded';
+    $img->addClass('figure-img')
+         ->addClassWhen($fluid, 'img-fluid')
+         ->addClassWhen($rounded, 'rounded');
+
 @endphp
 
 <figure {{ $attributes->merge(['class' => 'figure']) }}>
@@ -54,13 +46,13 @@
     <img
         src="{{ $src }}"
         alt="{{ $alt }}"
-        class="{{ implode(' ', $imgClasses) }}"
+        class="{{ $img->getClasses() }}"
         @if($lazy) loading="lazy" @endif
     >
 
     {{-- Die Caption (nur rendern, wenn Text vorhanden) --}}
     @if($caption)
-        <figcaption class="figure-caption {{ $captionClass }}">
+        <figcaption class="{{ $field->getClasses() }}">
             {{ $caption }}
         </figcaption>
     @endif

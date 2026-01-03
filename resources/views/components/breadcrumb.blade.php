@@ -3,15 +3,15 @@
 ])
 
 @php
-    // Klassen Array
-    $classes = ['breadcrumb'];
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $field = BootstrapUi::make();
+    $field->addClass('breadcrumb')
+          ->addStyleWhen($divider, '--bs-breadcrumb-divider', "'".$divider."'");
 @endphp
 
 <nav aria-label="breadcrumb" {{ $attributes->except('class') }}>
-    <ol
-        {{ $attributes->only('class')->merge(['class' => 'breadcrumb']) }}
-        @if($divider) style="--bs-breadcrumb-divider: '{{ $divider }}';" @endif
-    >
+    <ol {{ $attributes->only(['class', 'style'])->merge(['class' => $field->getClasses(), 'style' => $field->getStyles()]) }}>
         {{ $slot }}
     </ol>
 </nav>

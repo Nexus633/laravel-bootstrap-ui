@@ -6,28 +6,29 @@
 ])
 
 @php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
     use Illuminate\Support\Str;
-    if($dismiss) $attributes['data-bs-dismiss'] = $dismiss;
-    if($target) $attributes['data-bs-target'] = $target;
+
+    $field = BootstrapUi::make();
+
     $variantClass = '';
     if($variant){
         $actualVariant = $outline && !str_contains($variant, 'outline') ? 'outline-' . $variant : $variant;
         $variantClass = ' btn-' . $actualVariant;
     }
 
-    $classes = [
-        'btn-close' => empty(Str::trim($slot)),
-        'btn' => !empty(Str::trim($slot)),
-        $variantClass
-    ];
-
+    $field->addClassWhen(empty(Str::trim($slot)), 'btn-close')
+          ->addClassWhen(!empty(Str::trim($slot)), 'btn')
+          ->addClass($variantClass)
+          ->addDataWhen($dismiss, 'data-bs-dismiss', $dismiss)
+          ->addDataWhen($target, 'data-bs-target', $target);
 @endphp
 
 <button
     type="button"
-    {{ $attributes->class($classes) }}
+    {{ $attributes->class($field->getClasses())->merge($field->getDataAttributes()) }}
     aria-label="Close"
     @if($dismiss === 'modal') @click="$el.blur()" @endif
-    {{ $attributes }}>
+>
     {{ $slot }}
 </button>

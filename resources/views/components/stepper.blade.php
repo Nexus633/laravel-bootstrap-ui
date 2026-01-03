@@ -2,6 +2,13 @@
     'step' => 1, // Startwert (oder Livewire Binding)
 ])
 
+@php
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+
+    $field = BootstrapUi::make();
+    $field->addClass('d-flex', 'flex-column', 'gap-4');
+@endphp
+
 <div
     x-data="{
         step: @entangle($attributes->wire('model')).live ?? {{ $step }},
@@ -31,7 +38,7 @@
             return this.step === this.total;
         }
     }"
-    {{ $attributes->class(['d-flex flex-column gap-4']) }}
+    {{ $attributes->class($field->getClasses()) }}
 >
     {{ $slot }}
 </div>

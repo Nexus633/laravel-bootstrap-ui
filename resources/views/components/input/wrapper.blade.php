@@ -17,7 +17,7 @@
        Bei Floating Labels muss das Label nämlich zwingend NACH dem Input stehen.
     --}}
     @if($label && !$floating)
-        <label for="{{ $id }}" class="form-label">{{ $label }}</label>
+        <x-bs::text label for="{{ $id }}" class="form-label">{{ $label }}</x-bs::text>
     @endif
 
     {{-- Hier kommt der eigentliche Input oder die Group rein --}}
@@ -25,8 +25,8 @@
 
     {{-- ERROR & HINT --}}
     @if($hasError)
-        <div class="invalid-feedback d-block">{{ $errors->first($name) }}</div>
+        <x-bs::text div class="invalid-feedback d-block">{{ $errors->first($name) }}</x-bs::text>
     @elseif($hint)
-        <div class="form-text text-muted">{{ $hint }}</div>
+        <x-bs::text div class="form-text text-muted">{{ $hint }}</x-bs::text>
     @endif
 </div>

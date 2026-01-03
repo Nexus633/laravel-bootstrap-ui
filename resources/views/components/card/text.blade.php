@@ -2,10 +2,8 @@
     'content' => null
 ])
 @php
-
-    $baseClasses = [
-        "card-text"
-    ];
-
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
+    $field = BootstrapUi::make();
+    $field->addClass('card-text');
 @endphp
-<p class="{{ $attributes->class($baseClasses) }}">@if($content) {{ $content }} @else {{ $slot }} @endif</p>
+<p class="{{ $attributes->class($field->getClasses()) }}">@if($content) {{ $content }} @else {{ $slot }} @endif</p>

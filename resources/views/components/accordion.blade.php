@@ -6,13 +6,14 @@
 ])
 
 @php
-    $accordionId = $id ?? 'accordion-' . uniqid();
+    use Nexus633\BootstrapUi\Facades\BootstrapUi;
 
-     // Klassen zusammenbauen
-     $classes = [
-         'accordion',
-         'accordion-flush' => $flush,
-     ];
+    $field = BootstrapUi::make();
+
+    $accordionId = $attributes->getOrCreateId('accordion-');
+
+    $field->addClass('accordion')
+            ->addClassWhen($flush, 'accordion-flush');
 @endphp
 
 {{-- 
@@ -22,7 +23,7 @@
 --}}
 <div
     id="{{ $accordionId }}"
-    {{ $attributes->class($classes) }}
+    {{ $attributes->class($field->getClasses()) }}
     x-data="bsUiState('{{ $accordionId }}', 'accordion', {{ $persist ? 'true' : 'false' }})"
     {{ $attributes }}
 >
